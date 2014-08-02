@@ -34,6 +34,38 @@ void gt_trnt_getrate(uint64_t rsize, char *s) {
 	strcat(s, "/s");
 }
 
+void gt_trnt_getstate(enum torrent_state state, char *s) {
+	switch (state) {
+		case queued_for_checking:
+			strcpy(s, "queued for checking");
+			break;
+		case checking_files:
+			strcpy(s, "checking files");
+			break;
+		case downloading_metadata:
+			strcpy(s, "downloading metadata");
+			break;
+		case downloading:
+			strcpy(s, "downloading");
+			break;
+		case finished:
+			strcpy(s, "finished");
+			break;
+		case seeding:
+			strcpy(s, "seeding");
+			break;
+		case allocating:
+			strcpy(s, "allocating");
+			break;
+		case checking_resume_data:
+			strcpy(s, "checking resume data");
+			break;
+		default:
+			strcpy(s, "unknown");
+			break;
+	}
+}
+
 void gt_trnt_listen(session *s, int (*f)(session *)) {
 	struct timespec ntime = { .tv_sec = 0, .tv_nsec = 500000000l }, rem;
 

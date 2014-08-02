@@ -18,7 +18,8 @@ enum torrent_state {	// libtorrent::torrent_status::state_t
 	finished,
 	seeding,
 	allocating,
-	checking_resume_data
+	checking_resume_data,
+	unknown
 };
 
 struct trnt_stat_tag {	// libtorrent::torrent_status

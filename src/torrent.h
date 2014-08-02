@@ -14,6 +14,9 @@ void 		gt_trnt_getfsize	(uint64_t fsize, char *s);
 /* @gt_trnt_getrate(): converts raw rate in bytes/s to string format */
 void		gt_trnt_getrate		(uint64_t rsize, char *s);
 
+/* @gt_trnt_getstate(): converts state value to string format */
+void		gt_trnt_getstate	(enum torrent_state state, char *s);
+
 /* @gt_trnt_listen(): attach a listener for torrent progress */
 void		gt_trnt_listen	(session *s, int (*f)(session *));
 

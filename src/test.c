@@ -37,7 +37,7 @@ void test_download(const char *file_path) {
 
 // query and respond to status updates
 static int download_callback(session *ses) {
-	char dlspeed[20];
+	char dlspeed[20], down_done[20], down_want[20], state_s[20];
 	session_status *sstat = lt_session_get_status(ses);
 	torrent_handle **th = handles;
 	torrent_status *ts;
@@ -49,8 +49,12 @@ static int download_callback(session *ses) {
 			continue;
 		}
 		ts = lt_trnt_handle_get_status(*th);
+		gt_trnt_getstate(ts->state, state_s);
 		gt_trnt_getrate(ts->download_rate, dlspeed);
-		Console.debug("Downloading at %s", dlspeed);
+		gt_trnt_getfsize(ts->total_wanted_done, down_done);
+		gt_trnt_getfsize(ts->total_wanted, down_want);
+		Console.debug("%s at %s (%s / %s)",
+			state_s, dlspeed, down_done, down_want);
 	}
 
 	return 1;	// TODO: check against status

@@ -124,8 +124,22 @@ static enum torrent_state
 	switch (state) {
 	case queued_for_checking:
 		return (enum torrent_state) queued_for_checking;
-	default:
+	case checking_files:
+		return (enum torrent_state) checking_files;
+	case downloading_metadata:
+		return (enum torrent_state) downloading_metadata;
+	case downloading:
+		return (enum torrent_state) downloading;
+	case finished:
 		return (enum torrent_state) finished;
+	case seeding:
+		return (enum torrent_state) seeding;
+	case allocating:
+		return (enum torrent_state) allocating;
+	case checking_resume_data:
+		return (enum torrent_state) checking_resume_data;
+	default:
+		return (enum torrent_state) unknown;
 	}
 }
 
