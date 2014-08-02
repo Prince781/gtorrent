@@ -9,6 +9,7 @@
 #define KILOBYTE	1000
 #define MEGABYTE	1000000
 #define GIGABYTE	1000000000
+#define TERABYTE	1000000000000
 
 void gt_trnt_gettime(uint64_t t, char *s) {
 	sprintf(s, "%"PRIu64"d %"PRIu64"h %"PRIu64"m %"PRIu64"s",
@@ -16,12 +17,9 @@ void gt_trnt_gettime(uint64_t t, char *s) {
 }
 
 void gt_trnt_getfsize(uint64_t fsize, char *s) {
-	if (! fsize) {
-		*s = '\0';
-		return;
-	}
-
-	if (fsize / GIGABYTE)
+	if (fsize / TERABYTE)
+		sprintf(s, "%.3lf TB", fsize / (double)TERABYTE);
+	else if (fsize / GIGABYTE)
 		sprintf(s, "%.3lf GB", fsize / (double)GIGABYTE);
 	else if (fsize / MEGABYTE)
 		sprintf(s, "%.3lf MB", fsize / (double)MEGABYTE);
@@ -36,12 +34,9 @@ void gt_trnt_getrate(uint64_t rsize, char *s) {
 	strcat(s, "/s");
 }
 
-void gt_trnt_listen(session *s, int (*f)(session_status *)) {
-	session_status *ss = lt_session_status_create();
+void gt_trnt_listen(session *s, int (*f)(session *)) {
 	struct timespec ntime = { .tv_sec = 0, .tv_nsec = 500000000l }, rem;
-	do {
+
+	while ((*f)(s))
 		nanosleep(&ntime, &rem);
-		lt_session_get_status(s, ss);
-	} while ((*f)(ss));
-	free(ss);
 }

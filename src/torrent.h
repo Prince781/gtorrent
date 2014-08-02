@@ -15,6 +15,6 @@ void 		gt_trnt_getfsize	(uint64_t fsize, char *s);
 void		gt_trnt_getrate		(uint64_t rsize, char *s);
 
 /* @gt_trnt_listen(): attach a listener for torrent progress */
-void		gt_trnt_listen	(session *s, int (*f)(session_status *));
+void		gt_trnt_listen	(session *s, int (*f)(session *));
 
 #endif

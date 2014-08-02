@@ -3,7 +3,7 @@
 
 #include <inttypes.h>
 #include <stdbool.h>
-#include "lt_torrent.h"
+#include "torrent.h"
 
 struct session;		// libtorrent::session
 typedef struct session session;
@@ -59,6 +59,7 @@ struct sess_stat_tag {	// libtorrent::session_status
 };
 typedef struct sess_stat_tag session_status;
 
+
 /* @lt_session_create(): create a new session */
 session		*lt_session_create		(void);
 
@@ -79,12 +80,13 @@ void		lt_session_listen_on		(session *s, int x, int y);
 bool		lt_session_is_listening		(session *s);
 
 /* @lt_session_add_torrent(): add a torrent to a session */
-void		lt_session_add_torrent		(session *s, trnt_params *tp);
+void		lt_session_add_torrent		(session *s,
+						 torrent_params *tp);
 
 /* @lt_session_get_status(): get session status */
-void		lt_session_get_status	(session *s, session_status *ss);
+session_status	*lt_session_get_status		(session *s);
 
-/* @lt_session_status_create(): create new session status */
-session_status *lt_session_status_create	(void);
+/* @lt_session_get_torrents(): get torrent handles from session */
+void		lt_session_get_torrents	(session *s, torrent_handle **hs);
 
 #endif

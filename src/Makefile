@@ -20,7 +20,7 @@ clean:
 	$(RM) *.o $(GTORRENT)
 	$(MAKE) clean -C wrappers
 
-gtorrent.o: console.o core.o main.o torrent.o
+gtorrent.o: console.o core.o main.o torrent.o test.o
 	$(LD) -r *.o -o gtorrent.o
 
 console.o: console.c console.h
@@ -31,6 +31,9 @@ core.o: core.c core.h
 
 torrent.o: torrent.c torrent.h
 	$(CC) $(CFLAGS) -c torrent.c
+
+test.o: test.c test.h
+	$(CC) $(CFLAGS) -c test.c
 
 main.o: main.c
 	$(CC) $(CFLAGS) -c main.c 
