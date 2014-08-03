@@ -3,18 +3,19 @@ LD		= ld
 CC		= gcc
 CXX		= g++
 CFLAGS		= -g -Wall -O0
-LDLIBS		= `pkg-config --libs libtorrent-rasterbar`
+LDLIBS		= `pkg-config --libs libtorrent-rasterbar gtk+-3.0`
 GTORRENT	= ../gTorrent
 LTWRAPPER	= wrappers/libtorrent.o
+GUILIB		= gui.o
 
 # colors
 red		= '\e[0;31m'
 green		= '\e[1;32m'
 nc		= '\e[0m'
 
-all: gtorrent.o $(LTWRAPPER)
+all: gtorrent.o $(LTWRAPPER) $(GUILIB)
 	@echo -e ${green}Building everything...${nc}
-	$(CXX) $(CFLAGS) gtorrent.o $(LTWRAPPER) -o $(GTORRENT) $(LDLIBS)
+	$(CXX) $(CFLAGS) gtorrent.o $(LTWRAPPER) $(GUILIB) -o $(GTORRENT) $(LDLIBS)
 
 clean:
 	$(RM) *.o $(GTORRENT)
@@ -42,4 +43,8 @@ main.o: main.c
 $(LTWRAPPER):
 	@echo -e ${green}Building C wrapper for libtorrent-rasterbar...${nc}
 	@$(MAKE) -C wrappers
+
+$(GUILIB):
+	@echo -e ${green}Building GTK frontend...${nc}
+	@$(MAKE) -C gui
 
