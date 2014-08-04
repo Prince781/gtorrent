@@ -168,6 +168,18 @@ enum alert_type lt_alert_get_type(alert *a) {
 	}
 }
 
+bool lt_alert_is_torrent_alert(alert *a) {
+	libtorrent::alert& al = *reinterpret_cast<libtorrent::alert*>(a);
+
+	try {
+		libtorrent::torrent_alert& tal
+			= dynamic_cast<libtorrent::torrent_alert&>(al);
+		return true;
+	} catch (const std::bad_cast& e) {
+		return false;
+	}
+}
+
 torrent_handle *lt_alert_get_torrent_handle(alert *a) {
 	libtorrent::torrent_handle *th
 		= &reinterpret_cast<libtorrent::torrent_alert*>(a)->handle;

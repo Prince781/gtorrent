@@ -115,6 +115,9 @@ typedef struct alert_deque alert_deque;
 /* @lt_alert_get_type(): get the alert type */
 enum alert_type	lt_alert_get_type		(alert *a);
 
+/* @lt_alert_is_torrent_alert(): check if an alert is a torrent_alert */
+bool		lt_alert_is_torrent_alert	(alert *a);
+
 /* @lt_alert_get_torrent_handle(): get the torrent handle of an alert, if it
  * is a torrent_alert. Note that explicit checking must be done before calling
  * this function. */

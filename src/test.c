@@ -8,12 +8,13 @@
 #include "wrappers/libtorrent.h"
 
 /* @download_callback(): callback function for session */
-static int session_callback(gt_alert *);
+// static int session_callback(gt_alert *);
 static int torrent_callback(gt_alert *);
 
 int main(int argc, char *argv[]) {
 	gt_torrent *gtor;
 	char save_path[1024];
+	torrent_status *status;
 
 	if (argc == 1) {
 		printf("Usage: %s [torrent file]\n", argv[0]);
@@ -36,7 +37,7 @@ int main(int argc, char *argv[]) {
 		return 1;
 	}
 
-	gt_core_session_set_callback(session_callback);
+//	gt_core_session_set_callback(session_callback);
 	gtor->call = torrent_callback;
 
 	if (!gt_core_session_add_torrent(gtor)) {
@@ -45,7 +46,12 @@ int main(int argc, char *argv[]) {
 		return 1;
 	}
 
-	for (;;) gt_core_session_update();	// mayhem
+	do {
+		gt_core_session_update();
+		status = lt_trnt_handle_get_status(gtor->th);
+	} while (!status->is_finished);
+
+	Console.debug("Download complete.");
 
 	Console.debug("gTorrent terminating...");
 	gt_core_session_end();
@@ -67,6 +73,12 @@ static int session_callback(gt_alert *ga) {
 
 // respond to torrent updates
 static int torrent_callback(gt_alert *ga) {
+	char buf[100];
+	torrent_status *status;
+
+	status = lt_trnt_handle_get_status(ga->trnt->th);
+	gt_trnt_getrate(status->download_payload_rate, buf);
 	Console.debug("Torrent alert is %s", alert_str[ga->type]);
+	Console.debug("DL rate: %s", buf);
 	return 1;
 }

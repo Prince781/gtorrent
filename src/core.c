@@ -104,7 +104,8 @@ int gt_core_session_update(void) {
 		if (gtorrent_alert.trnt != NULL
 		 && gtorrent_alert.trnt->call != NULL)
 			gtorrent_alert.trnt->call(&gtorrent_alert);
-		else if (gtorrent_alert.trnt == NULL)
+		else if (gtorrent_alert.trnt == NULL
+		 && resp != NULL)
 			(*resp)(&gtorrent_alert);
 	}
 
@@ -113,25 +114,12 @@ int gt_core_session_update(void) {
 
 static void gt_core_alert_convert(gt_alert *ga, alert *a) {
 	torrent_handle *thandle;
-	enum alert_type altype;
 	gt_torrent *gtp;
 
 	ga->ses = ses;
 	ga->trnt = NULL;
 
-	switch (altype = lt_alert_get_type(a)) {
-	case torrent_alert:
-	case peer_alert:
-	case tracker_alert:
-	case torrent_added_alert:
-	case torrent_removed_alert:
-	case file_completed_alert:
-	case torrent_finished_alert:
-	case torrent_paused_alert:
-	case torrent_resumed_alert:
-	case torrent_checked_alert:
-	case torrent_error_alert:
-	case state_changed_alert:
+	if (lt_alert_is_torrent_alert(a)) {
 		// has a torrent_handle member; search for match
 		thandle = lt_alert_get_torrent_handle(a);
 		for (gtp = tbase; gtp != NULL; gtp = gtp->next)
@@ -139,9 +127,7 @@ static void gt_core_alert_convert(gt_alert *ga, alert *a) {
 				ga->trnt = gtp;
 				break;
 			}
-		break;
-	default: break;
 	}
 
-	ga->type = altype;
+	ga->type = lt_alert_get_type(a);
 }

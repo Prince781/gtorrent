@@ -24,3 +24,6 @@
 
 # Test files
 *.torrent
+
+# Vim files
+.*.swp
