@@ -1,12 +1,17 @@
 #include "deps.hpp"
 
+#define MEMBER(a)	a
+#define STRUCT_MEMBER(s,m)	s. MEMBER(m)
+#define STRUCTP_MEMBER(s,m)	s-> MEMBER(m)
+#define TSTATE_ASSIGN(a,b,m,t)	\
+	STRUCTP_MEMBER(a,m) = (t) STRUCT_MEMBER(b,m)
+
 extern "C" {
 
-#include <stdio.h>
 #include "torrent.h"
 
 /* @lt_trnt_status_cnvt(): convert a torrent status */
-static void lt_trnt_status_cnvt(libtorrent::torrent_handle *, torrent_status *);
+static void lt_trnt_status_cnvt(libtorrent::torrent_handle *,torrent_status *);
 
 /* @lt_trnt_state_cnvt(): convert a torrent state */
 static enum torrent_state
@@ -15,6 +20,10 @@ static enum torrent_state
 torrent_params *lt_trnt_params_create(void) {
 	return reinterpret_cast<torrent_params*>
 		(new libtorrent::add_torrent_params());
+}
+
+void lt_trnt_params_destroy(torrent_params *tp) {
+	delete reinterpret_cast<libtorrent::add_torrent_params*>(tp);
 }
 
 void lt_trnt_params_set_savepath(torrent_params *tp, const char *path) {
@@ -28,10 +37,19 @@ torrent_info *lt_trnt_info_create(const char *path) {
 		(new libtorrent::torrent_info(std::string(path)));
 }
 
+void lt_trnt_info_destroy(torrent_info *ti) {
+	delete reinterpret_cast<libtorrent::torrent_info*>(ti);
+}
+
 void lt_trnt_params_set_info(torrent_params *tp, torrent_info *ti) {
 	libtorrent::add_torrent_params *torp
 		= reinterpret_cast<libtorrent::add_torrent_params*>(tp);
 	torp->ti = reinterpret_cast<libtorrent::torrent_info*>(ti);
+}
+
+const char *lt_trnt_params_get_name(torrent_params *tp) {
+	return reinterpret_cast<libtorrent::add_torrent_params*>
+		(tp)->name.c_str();
 }
 
 bool lt_trnt_handle_is_valid(torrent_handle *th) {
@@ -46,81 +64,79 @@ torrent_status *lt_trnt_handle_get_status(torrent_handle *th) {
 	return &ts;
 }
 
-static void lt_trnt_status_cnvt(libtorrent::torrent_handle *th,
-	torrent_status *ts) {
-	th->is_valid();
+static void
+lt_trnt_status_cnvt(libtorrent::torrent_handle *th, torrent_status *ts) {
 	libtorrent::torrent_status tstat = th->status();
+
+	strncpy(ts->error, tstat.error.c_str(), LT_STATUS_LEN-1);
+	ts->error[LT_STATUS_LEN-1] = '\0';
+	strncpy(ts->save_path, tstat.save_path.c_str(), LT_STATUS_LEN-1);
+	ts->save_path[LT_STATUS_DIR_LEN-1] = '\0';
+	strncpy(ts->name, tstat.name.c_str(), LT_STATUS_LEN-1);
+	ts->name[LT_STATUS_LEN-1] = '\0';
+	TSTATE_ASSIGN(ts,tstat,total_download,uint64_t);
+	TSTATE_ASSIGN(ts,tstat,total_upload,uint64_t);
+	TSTATE_ASSIGN(ts,tstat,total_payload_download,uint64_t);
+	TSTATE_ASSIGN(ts,tstat,total_payload_upload,uint64_t);
+	TSTATE_ASSIGN(ts,tstat,total_redundant_bytes,uint64_t);
+	TSTATE_ASSIGN(ts,tstat,total_done,uint64_t);
+	TSTATE_ASSIGN(ts,tstat,total_wanted_done,uint64_t);
+	TSTATE_ASSIGN(ts,tstat,total_wanted,uint64_t);
+	TSTATE_ASSIGN(ts,tstat,all_time_upload,uint64_t);
+	TSTATE_ASSIGN(ts,tstat,all_time_download,uint64_t);
+	TSTATE_ASSIGN(ts,tstat,added_time,time_t);
+	TSTATE_ASSIGN(ts,tstat,completed_time,time_t);
+	TSTATE_ASSIGN(ts,tstat,last_seen_complete,time_t);
+	TSTATE_ASSIGN(ts,tstat,progress,float);
+	TSTATE_ASSIGN(ts,tstat,progress_ppm,int);
+	TSTATE_ASSIGN(ts,tstat,queue_position,int);
+	TSTATE_ASSIGN(ts,tstat,download_rate,int);
+	TSTATE_ASSIGN(ts,tstat,upload_rate,int);
+	TSTATE_ASSIGN(ts,tstat,download_payload_rate,int);
+	TSTATE_ASSIGN(ts,tstat,num_seeds,int);
+	TSTATE_ASSIGN(ts,tstat,num_peers,int);
+	TSTATE_ASSIGN(ts,tstat,num_complete,int);
+	TSTATE_ASSIGN(ts,tstat,num_incomplete,int);
+	TSTATE_ASSIGN(ts,tstat,list_seeds,int);
+	TSTATE_ASSIGN(ts,tstat,connect_candidates,int);
+	TSTATE_ASSIGN(ts,tstat,num_pieces,int);
+	TSTATE_ASSIGN(ts,tstat,distributed_full_copies,int);
+	TSTATE_ASSIGN(ts,tstat,distributed_fraction,int);
+	TSTATE_ASSIGN(ts,tstat,distributed_copies,float);
+	TSTATE_ASSIGN(ts,tstat,block_size,int);
+	TSTATE_ASSIGN(ts,tstat,num_uploads,int);
+	TSTATE_ASSIGN(ts,tstat,num_connections,int);
+	TSTATE_ASSIGN(ts,tstat,uploads_limit,int);
+	TSTATE_ASSIGN(ts,tstat,connections_limit,int);
+	TSTATE_ASSIGN(ts,tstat,up_bandwidth_queue,int);
+	TSTATE_ASSIGN(ts,tstat,down_bandwidth_queue,int);
+	TSTATE_ASSIGN(ts,tstat,time_since_upload,int);
+	TSTATE_ASSIGN(ts,tstat,time_since_download,int);
+	TSTATE_ASSIGN(ts,tstat,active_time,int);
+	TSTATE_ASSIGN(ts,tstat,finished_time,int);
+	TSTATE_ASSIGN(ts,tstat,seeding_time,int);
+	TSTATE_ASSIGN(ts,tstat,seed_rank,int);
+	TSTATE_ASSIGN(ts,tstat,last_scrape,int);
+	TSTATE_ASSIGN(ts,tstat,sparse_regions,int);
+	TSTATE_ASSIGN(ts,tstat,priority,int);
 	ts->state = lt_trnt_state_cnvt(tstat.state);
-	ts->paused = tstat.paused;
-	ts->auto_managed = tstat.auto_managed;
-	ts->sequential_download = tstat.sequential_download;
-	ts->is_seeding = tstat.is_seeding;
-	ts->is_finished = tstat.is_finished;
-	ts->progress = tstat.progress;
-	ts->progress_ppm = tstat.progress_ppm;
-	ts->error = tstat.error.c_str();	// may be unsafe
-	ts->current_tracker = tstat.current_tracker.c_str();
-	ts->total_download = tstat.total_download;
-	ts->total_upload = tstat.total_upload;
-	ts->total_payload_download = tstat.total_payload_download;
-	ts->total_payload_upload = tstat.total_payload_upload;
-	ts->total_failed_bytes = tstat.total_failed_bytes;
-	ts->total_redundant_bytes = tstat.total_redundant_bytes;
-	ts->download_rate = tstat.download_rate;
-	ts->upload_rate = tstat.upload_rate;
-	ts->download_payload_rate = tstat.download_payload_rate;
-	ts->upload_payload_rate = tstat.upload_payload_rate;
-	ts->num_peers = tstat.num_peers;
-	ts->num_complete = tstat.num_complete;
-	ts->list_seeds = tstat.list_seeds;
-	ts->list_peers = tstat.list_peers;
-	ts->connect_candidates = tstat.connect_candidates;
-	// TODO: bitfield pieces
-	// TODO: bitfield verified_pieces
-	ts->num_pieces = tstat.num_pieces;
-	ts->total_done = tstat.total_done;
-	ts->total_wanted_done = tstat.total_wanted_done;
-	ts->total_wanted = tstat.total_wanted;
-	ts->num_seeds = tstat.num_seeds;
-	ts->distributed_full_copies = tstat.distributed_full_copies;
-	ts->distributed_fraction = tstat.distributed_fraction;
-	ts->distributed_copies = tstat.distributed_copies;
-	ts->block_size = tstat.block_size;
-	ts->num_uploads = tstat.num_uploads;
-	ts->num_connections = tstat.num_connections;
-	ts->uploads_limit = tstat.uploads_limit;
-	ts->connections_limit = tstat.connections_limit;
-	// TODO: storage_mode_t storage_mode
-	ts->up_bandwidth_queue = tstat.up_bandwidth_queue;
-	ts->down_bandwidth_queue = tstat.down_bandwidth_queue;
-	ts->all_time_upload = tstat.all_time_upload;
-	ts->all_time_download = tstat.all_time_download;
-	ts->active_time = tstat.active_time;
-	ts->finished_time = tstat.finished_time;
-	ts->seeding_time = tstat.seeding_time;
-	ts->seed_rank = tstat.seed_rank;
-	ts->last_scrape = tstat.last_scrape;
-	ts->has_incoming = tstat.has_incoming;
-	ts->sparse_regions = tstat.sparse_regions;
-	ts->seed_mode = tstat.seed_mode;
-	ts->upload_mode = tstat.upload_mode;
-	ts->share_mode = tstat.share_mode;
-	ts->super_seeding = tstat.super_seeding;
-	ts->priority = tstat.priority;
-	ts->added_time = &tstat.added_time;
-	ts->completed_time = &tstat.completed_time;
-	ts->last_seen_complete = &tstat.last_seen_complete;
-	ts->time_since_upload = tstat.time_since_upload;
-	ts->time_since_download = tstat.time_since_download;
-	ts->queue_position = tstat.queue_position;
-	ts->need_save_resume = tstat.need_save_resume;
-	ts->ip_filter_applies = tstat.ip_filter_applies;
-	// TODO: sha1_hash info_hash
-	ts->listen_port = tstat.listen_port;
+	TSTATE_ASSIGN(ts,tstat,need_save_resume,bool);
+	TSTATE_ASSIGN(ts,tstat,ip_filter_applies,bool);
+	TSTATE_ASSIGN(ts,tstat,upload_mode,bool);
+	TSTATE_ASSIGN(ts,tstat,share_mode,bool);
+	TSTATE_ASSIGN(ts,tstat,super_seeding,bool);
+	TSTATE_ASSIGN(ts,tstat,paused,bool);
+	TSTATE_ASSIGN(ts,tstat,auto_managed,bool);
+	TSTATE_ASSIGN(ts,tstat,sequential_download,bool);
+	TSTATE_ASSIGN(ts,tstat,is_seeding,bool);
+	TSTATE_ASSIGN(ts,tstat,is_finished,bool);
+	TSTATE_ASSIGN(ts,tstat,has_metadata,bool);
+	TSTATE_ASSIGN(ts,tstat,seed_mode,bool);
+	TSTATE_ASSIGN(ts,tstat,moving_storage,bool);
 }
 
 static enum torrent_state
-	lt_trnt_state_cnvt(enum libtorrent::torrent_status::state_t state) {
+lt_trnt_state_cnvt(enum libtorrent::torrent_status::state_t state) {
 	switch (state) {
 	case queued_for_checking:
 		return (enum torrent_state) queued_for_checking;
@@ -141,6 +157,23 @@ static enum torrent_state
 	default:
 		return (enum torrent_state) unknown;
 	}
+}
+
+torrent_handle *lt_trnt_vector_get(torrent_vector *tv, uint64_t i) {
+	std::vector<libtorrent::torrent_handle> *hvec
+	      = reinterpret_cast<std::vector<libtorrent::torrent_handle>*>(tv);
+	if (i < hvec->size())
+		return reinterpret_cast<torrent_handle*>(&hvec->at(i));
+	else return NULL;
+}
+
+bool lt_trnt_handle_equal(torrent_handle *a, torrent_handle *b) {
+	libtorrent::torrent_handle *tha, *thb;
+
+	tha = reinterpret_cast<libtorrent::torrent_handle*>(a);
+	thb = reinterpret_cast<libtorrent::torrent_handle*>(b);
+
+	return *tha == *thb;
 }
 
 }

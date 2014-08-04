@@ -4,6 +4,7 @@
 #include <inttypes.h>
 #include <stdbool.h>
 #include "torrent.h"
+#include "alerttypes.h"
 
 struct session;		// libtorrent::session
 typedef struct session session;
@@ -59,9 +60,11 @@ struct sess_stat_tag {	// libtorrent::session_status
 };
 typedef struct sess_stat_tag session_status;
 
-
 /* @lt_session_create(): create a new session */
 session		*lt_session_create		(void);
+
+/* @lt_session_destroy(): remove a session */
+void		lt_session_destroy		(session *s);
 
 /* @lt_session_pause(): pause a session */
 void 		lt_session_pause		(session *s);
@@ -79,14 +82,25 @@ void		lt_session_listen_on		(session *s, int x, int y);
  * listening port */
 bool		lt_session_is_listening		(session *s);
 
-/* @lt_session_add_torrent(): add a torrent to a session */
-void		lt_session_add_torrent		(session *s,
+/* @lt_session_add_torrent(): add a torrent to a session. A new torrent_handle
+ * is returned from this. */
+torrent_handle	*lt_session_add_torrent		(session *s,
 						 torrent_params *tp);
+
+/* @lt_session_remove_torrent(): remove a torrent handle from the session */
+void		lt_session_remove_torrent	(session *s,
+						 torrent_handle *th);
 
 /* @lt_session_get_status(): get session status */
 session_status	*lt_session_get_status		(session *s);
 
 /* @lt_session_get_torrents(): get torrent handles from session */
-void		lt_session_get_torrents	(session *s, torrent_handle **hs);
+torrent_vector	*lt_session_get_torrents	(session *s);
+
+/* @lt_session_set_alert_mask(): configure alert mask for session */
+void		lt_session_set_alert_mask	(session *s, uint32_t mask);
+
+/* @lt_session_pop_alerts(): pop all alerts from session */
+void		lt_session_pop_alerts		(session *s, alert_deque *ad);
 
 #endif

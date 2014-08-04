@@ -4,5 +4,6 @@
 #include "lt/session.h"
 #include "lt/torrent.h"
 #include "lt/filestorage.h"
+#include "lt/alerttypes.h"
 
 #endif

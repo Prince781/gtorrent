@@ -12,6 +12,10 @@ session* lt_session_create(void) {
 	return reinterpret_cast<session*>(new libtorrent::session());
 }
 
+void lt_session_destroy(session *s) {
+	delete reinterpret_cast<libtorrent::session*>(s);
+}
+
 void lt_session_pause(session *s) {
 	reinterpret_cast<libtorrent::session*>(s)->pause();
 }
@@ -33,11 +37,24 @@ bool lt_session_is_listening(session *s) {
 	return reinterpret_cast<libtorrent::session*>(s)->is_listening();
 }
 
-void lt_session_add_torrent(session *s, torrent_params *tp) {
+torrent_handle *lt_session_add_torrent(session *s, torrent_params *tp) {
 	libtorrent::session *ses = reinterpret_cast<libtorrent::session*>(s);
 	libtorrent::add_torrent_params *torp
 		= reinterpret_cast<libtorrent::add_torrent_params*>(tp);
-	ses->add_torrent(*torp);
+	libtorrent::torrent_handle *th = new libtorrent::torrent_handle();
+	*th = ses->add_torrent(*torp);
+	return reinterpret_cast<torrent_handle*>(th);
+}
+
+void lt_session_remove_torrent(session *s, torrent_handle *th) {
+	libtorrent::session *ses;
+	libtorrent::torrent_handle *torh;
+
+	ses = reinterpret_cast<libtorrent::session*>(s);
+	torh = reinterpret_cast<libtorrent::torrent_handle*>(th);
+
+	ses->remove_torrent(*torh);
+	
 }
 
 session_status *lt_session_get_status(session *s) {
@@ -90,23 +107,25 @@ static void lt_sstat_cnvt(libtorrent::session_status sstat,
 	ss->peerlist_size = sstat.peerlist_size;
 }
 
-void lt_session_get_torrents(session *s, torrent_handle **hs) {
-	libtorrent::session *ses = reinterpret_cast<libtorrent::session*>(s);
-	std::vector<libtorrent::torrent_handle> handles = ses->get_torrents();
-	unsigned i;
+torrent_vector *lt_session_get_torrents(session *s) {
+	static std::vector<libtorrent::torrent_handle> handles;
+	libtorrent::session *ses;
 
-	for (i=0; i<handles.size(); ++i) {
-		if (hs[i] == NULL)
-			hs[i] = (torrent_handle *)
-				malloc(sizeof(libtorrent::torrent_handle));
-		memcpy(hs[i],
-		       reinterpret_cast<torrent_handle*>(&handles.at(i)),
-		       sizeof(libtorrent::torrent_handle));
-	}
-	if (hs[i] != NULL) {
-		free(hs[i]);
-		hs[i] = NULL;
-	}
+	ses = reinterpret_cast<libtorrent::session*>(s); 
+	handles = ses->get_torrents();
+	return reinterpret_cast<torrent_vector*>(&handles);
+}
+
+void lt_session_set_alert_mask(session *s, uint32_t mask) {
+	reinterpret_cast<libtorrent::session*>(s)->set_alert_mask(mask);
+}
+
+void lt_session_pop_alerts(session *s, alert_deque *ad) {
+	libtorrent::session *ses = reinterpret_cast<libtorrent::session*>(s);
+	std::deque<libtorrent::alert*> *dq
+		= reinterpret_cast<std::deque<libtorrent::alert*>*>(ad);
+
+	ses->pop_alerts(dq);	// fill with alerts
 }
 
 }
