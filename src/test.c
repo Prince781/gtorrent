@@ -1,61 +1,72 @@
 // test gtorrent functionality thus far
 #include <stdio.h>
 #include <stdlib.h>
-#include "test.h"
 #include "console.h"
 #include "core.h"
+#include "torrent.h"
+#include "alerts.h"
 #include "wrappers/libtorrent.h"
 
-static torrent_handle *handles[MAX_TORRENTS];
+/* @download_callback(): callback function for session */
+static int session_callback(gt_alert *);
+static int torrent_callback(gt_alert *);
 
-static int download_callback(session *ses);
-
-void test_download(const char *file_path) {
+int main(int argc, char *argv[]) {
+	gt_torrent *gtor;
 	char save_path[1024];
-	session *ses = lt_session_create();
-	torrent_params *tp = lt_trnt_params_create();
-	torrent_info *ti = lt_trnt_info_create(file_path);
 
-	if (!ti) {
-		Console.error("Invalid file path.");
-		return;
-	} else if (!gt_core_get_savepath(save_path)) {
-		Console.error("Could not get save path.");
-		return;
+	if (argc == 1) {
+		printf("Usage: %s [torrent file]\n", argv[0]);
+		return 1;
 	}
 
-	Console.debug("Saving to %s...", save_path);
+	Console.debug("Initializing core...");
 
-	lt_session_listen_on(ses, LISTEN_PORT_X, LISTEN_PORT_Y);
-	lt_trnt_params_set_savepath(tp, save_path);
-	lt_trnt_params_set_info(tp, ti);
-	lt_session_add_torrent(ses, tp);	// start torrent download
+	gt_core_session_start(GT_CORE_DEFAULT_PORTS());
+	
+	if (!gt_core_get_savepath(save_path)) {
+		Console.error("Could not get save path.");
+		gt_core_session_end();
+		return 1;
+	}
 
-	Console.debug("Starting callback handler...");
-	gt_trnt_listen(ses, download_callback);	// attach callback handler
+	if ((gtor = gt_trnt_create(argv[1], save_path)) == NULL) {
+		Console.error("Could not create torrent.");
+		gt_core_session_end();
+		return 1;
+	}
+
+	gt_core_session_set_callback(session_callback);
+	gtor->call = torrent_callback;
+
+	if (!gt_core_session_add_torrent(gtor)) {
+		Console.error("Could not add torrent.");
+		gt_core_session_end();
+		return 1;
+	}
+
+	for (;;) gt_core_session_update();	// mayhem
+
+	Console.debug("gTorrent terminating...");
+	gt_core_session_end();
+
+	return 0;
 }
 
-// query and respond to status updates
-static int download_callback(session *ses) {
-	char dlspeed[20], down_done[20], down_want[20], state_s[20];
-	session_status *sstat = lt_session_get_status(ses);
-	torrent_handle **th = handles;
-	torrent_status *ts;
 
-	lt_session_get_torrents(ses, handles);	// fill handles
-	for (; *th != NULL; ++th) {
-		if (!lt_trnt_handle_is_valid(*th)) {
-			Console.error("Torrent handle is invalid!");
-			continue;
-		}
-		ts = lt_trnt_handle_get_status(*th);
-		gt_trnt_getstate(ts->state, state_s);
-		gt_trnt_getrate(ts->download_rate, dlspeed);
-		gt_trnt_getfsize(ts->total_wanted_done, down_done);
-		gt_trnt_getfsize(ts->total_wanted, down_want);
-		Console.debug("%s at %s (%s / %s)",
-			state_s, dlspeed, down_done, down_want);
-	}
+// respond to status updates
+static int session_callback(gt_alert *ga) {
+	//char buf[100];
+	//session_status *ss = lt_session_get_status(ga->ses);
 
-	return 1;	// TODO: check against status
+	// gt_trnt_getrate(ss->payload_download_rate, buf);
+	Console.debug("Session alert is %s", alert_str[ga->type]);
+	// Console.debug("Download rate (payload): %s", buf);
+	return 1;
+}
+
+// respond to torrent updates
+static int torrent_callback(gt_alert *ga) {
+	Console.debug("Torrent alert is %s", alert_str[ga->type]);
+	return 1;
 }

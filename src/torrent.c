@@ -1,15 +1,19 @@
 // torrent.c
 #include <stdio.h>
 #include <string.h>
-#include <time.h>
 #include <stdlib.h>
 #include "torrent.h"
+#include "console.h"
+#include "core.h"
 
 // rate speeds are in multiples of 1000
 #define KILOBYTE	1000
 #define MEGABYTE	1000000
 #define GIGABYTE	1000000000
 #define TERABYTE	1000000000000
+
+/* @default_trnt_callback: default callback for torrents */
+static int default_trnt_callback(gt_alert *a);
 
 void gt_trnt_gettime(uint64_t t, char *s) {
 	sprintf(s, "%"PRIu64"d %"PRIu64"h %"PRIu64"m %"PRIu64"s",
@@ -66,9 +70,40 @@ void gt_trnt_getstate(enum torrent_state state, char *s) {
 	}
 }
 
-void gt_trnt_listen(session *s, int (*f)(session *)) {
-	struct timespec ntime = { .tv_sec = 0, .tv_nsec = 500000000l }, rem;
+gt_torrent *gt_trnt_create(char *file, char *save_path) {
+	gt_torrent *gtp = (gt_torrent *) malloc(sizeof(gt_torrent));
 
-	while ((*f)(s))
-		nanosleep(&ntime, &rem);
+	if (gtp == NULL)
+		return NULL;
+
+	gtp->tp = lt_trnt_params_create();
+	gtp->ti = lt_trnt_info_create(file);
+
+	if (save_path != NULL)
+		lt_trnt_params_set_savepath(gtp->tp, save_path);
+	else {
+		char savepath[1024];
+		lt_trnt_params_set_savepath(gtp->tp,
+			gt_core_get_savepath(savepath));
+	}
+
+	Console.debug("Saving %s in directory %s...", file, save_path);
+	lt_trnt_params_set_info(gtp->tp, gtp->ti);
+	gtp->call = default_trnt_callback;
+	gtp->next = NULL;
+
+	return gtp;
+}
+
+void gt_trnt_destroy(gt_torrent *t) {
+	lt_trnt_params_destroy(t->tp);
+	lt_trnt_info_destroy(t->ti);
+	// lt_trnt_handle_delete(t->th);
+	free(t);
+}
+
+static int default_trnt_callback(gt_alert *a) {
+	Console.debug("Default alert for torrent %s",
+		lt_trnt_params_get_name(a->trnt->tp));
+	return 1;
 }
