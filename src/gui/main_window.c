@@ -1,5 +1,4 @@
 #include <gtk/gtk.h>
-#include "main_window.h"
 
 const char mw_title[] = "gTorrent";
 static GtkWidget *main_window;
@@ -7,18 +6,14 @@ static GtkWidget *mw_headerbar;
 
 static void headerbar_populate(GtkWidget *);
 
-void gt_gui_main_window_init(int argc, char *argv[]) {
-	gtk_init(&argc, &argv);
-	
+void gt_gui_activate(GApplication *app, gpointer user_data) {
 	// widget init
-	main_window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
+	main_window = gtk_application_window_new(GTK_APPLICATION(app));
 	mw_headerbar = gtk_header_bar_new();
 	
 	// main window
 	gtk_window_set_titlebar(GTK_WINDOW(main_window), mw_headerbar);
 	gtk_window_set_default_size(GTK_WINDOW(main_window), 820, 600);
-	g_signal_connect(main_window, "destroy", G_CALLBACK(gtk_main_quit),
-			 NULL);
 	
 	// header bar widget
 	gtk_header_bar_set_title(GTK_HEADER_BAR(mw_headerbar), mw_title);
@@ -28,8 +23,6 @@ void gt_gui_main_window_init(int argc, char *argv[]) {
 	// add widgets to window
 
 	gtk_widget_show_all(main_window);
-
-	gtk_main();		// start main loop
 }
 
 // populate headerbar and initialize
