@@ -43,12 +43,12 @@ void gt_core_session_start(int x, int y) {
 }
 
 void gt_core_session_end(void) {
-	lt_session_destroy(ses);
 	lt_alert_deque_destroy(alerts);
 	resp = NULL;
 	
 	if (tbase != NULL)
 		gt_core_trntlist_destroy(&tbase);
+	lt_session_destroy(ses);
 }
 
 static void gt_core_trntlist_destroy(gt_torrent **p) {
@@ -56,7 +56,7 @@ static void gt_core_trntlist_destroy(gt_torrent **p) {
 		gt_core_trntlist_destroy(&(*p)->next);
 	(*p)->next = NULL;
 	lt_session_remove_torrent(ses, (*p)->th);
-	gt_trnt_destroy(*p);
+//	gt_trnt_destroy(*p);
 }
 
 void gt_core_session_set_callback(int (*f)(gt_alert *)) {

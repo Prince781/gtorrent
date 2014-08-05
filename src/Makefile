@@ -3,7 +3,7 @@
 LD		= ld
 CC		= gcc
 CXX		= g++
-CFLAGS		= -g -Wall -O3
+CFLAGS		= -g -Wall -O0
 LDLIBS		= `pkg-config --libs libtorrent-rasterbar gtk+-3.0`
 GTORRENT	= ../gTorrent
 LTWRAPPER	= wrappers/libtorrent.o
