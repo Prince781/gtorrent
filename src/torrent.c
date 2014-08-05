@@ -98,7 +98,7 @@ gt_torrent *gt_trnt_create(char *file, char *save_path) {
 void gt_trnt_destroy(gt_torrent *t) {
 	lt_trnt_params_destroy(t->tp);
 	lt_trnt_info_destroy(t->ti);
-	// lt_trnt_handle_delete(t->th);
+	lt_trnt_handle_destroy(t->th);
 	free(t);
 }
 

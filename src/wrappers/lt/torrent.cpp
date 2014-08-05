@@ -56,6 +56,10 @@ bool lt_trnt_handle_is_valid(torrent_handle *th) {
 	return reinterpret_cast<libtorrent::torrent_handle*>(th)->is_valid();
 }
 
+void lt_trnt_handle_destroy(torrent_handle *th) {
+	delete reinterpret_cast<libtorrent::torrent_handle*>(th);
+}
+
 torrent_status *lt_trnt_handle_get_status(torrent_handle *th) {
 	static torrent_status ts;
 

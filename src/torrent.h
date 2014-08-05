@@ -30,7 +30,9 @@ void		gt_trnt_getstate	(enum torrent_state state, char *s);
  * link) and a save path for the downloaded data. */
 gt_torrent	*gt_trnt_create		(char *file, char *save_path);
 
-/* @gt_trnt_destroy(): delete a gt_torrent */
+/* @gt_trnt_destroy(): delete a gt_torrent. Note that the next member is not
+ * destroyed, and is only done so automatically if the torrent is on the list
+ * that is freed when gt_core_session_end() is called. */
 void		gt_trnt_destroy		(gt_torrent *t);
 
 #endif

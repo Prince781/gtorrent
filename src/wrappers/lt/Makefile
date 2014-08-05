@@ -1,6 +1,6 @@
 LD	= ld
 CXX	= g++
-CFLAGS	= -g -Wall O0
+CXXFLAGS= -g -Wall -O3
 LDLIBS	= `pkg-config --libs libtorrent-rasterbar`
 WRAPPER	= ../libtorrent.o
 OBJECTS = session.o torrent.o filestorage.o alerttypes.o

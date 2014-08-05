@@ -12,6 +12,7 @@ static gt_torrent *tbase;		// base pointer to next torrent
 
 static struct timespec interv;		// update interval
 
+static void gt_core_trntlist_destroy(gt_torrent **);
 static void gt_core_alert_convert(gt_alert *, alert *);
 
 int gt_core_is_maglink(const char *url) {
@@ -45,7 +46,17 @@ void gt_core_session_end(void) {
 	lt_session_destroy(ses);
 	lt_alert_deque_destroy(alerts);
 	resp = NULL;
-	// TODO: destroy all torrents
+	
+	if (tbase != NULL)
+		gt_core_trntlist_destroy(&tbase);
+}
+
+static void gt_core_trntlist_destroy(gt_torrent **p) {
+	if ((*p)->next != NULL)
+		gt_core_trntlist_destroy(&(*p)->next);
+	(*p)->next = NULL;
+	lt_session_remove_torrent(ses, (*p)->th);
+	gt_trnt_destroy(*p);
 }
 
 void gt_core_session_set_callback(int (*f)(gt_alert *)) {

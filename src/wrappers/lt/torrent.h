@@ -131,6 +131,10 @@ const char	*lt_trnt_params_get_name	(torrent_params *tp);
 /* @lt_trnt_handle_is_valid(): determine if torrent handle is valid */
 bool		lt_trnt_handle_is_valid		(torrent_handle *th);
 
+/* @lt_trnt_handle_destroy(): destroys a torrent_handle that was allocated
+ * by a call to lt_session_add_torrent() */
+void		lt_trnt_handle_destroy		(torrent_handle *th);
+
 /* @lt_trnt_handle_get_status(): get status from torrent handle */
 torrent_status	*lt_trnt_handle_get_status	(torrent_handle *th);
 

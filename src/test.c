@@ -7,8 +7,8 @@
 #include "alerts.h"
 #include "wrappers/libtorrent.h"
 
-/* @download_callback(): callback function for session */
-// static int session_callback(gt_alert *);
+/* @session_callback(): callback function for session */
+static int session_callback(gt_alert *);
 static int torrent_callback(gt_alert *);
 
 int main(int argc, char *argv[]) {
@@ -37,7 +37,7 @@ int main(int argc, char *argv[]) {
 		return 1;
 	}
 
-//	gt_core_session_set_callback(session_callback);
+	gt_core_session_set_callback(session_callback);
 	gtor->call = torrent_callback;
 
 	if (!gt_core_session_add_torrent(gtor)) {
@@ -73,12 +73,15 @@ static int session_callback(gt_alert *ga) {
 
 // respond to torrent updates
 static int torrent_callback(gt_alert *ga) {
-	char buf[100];
+	char buf[100], buf2[100];
 	torrent_status *status;
 
 	status = lt_trnt_handle_get_status(ga->trnt->th);
 	gt_trnt_getrate(status->download_payload_rate, buf);
 	Console.debug("Torrent alert is %s", alert_str[ga->type]);
 	Console.debug("DL rate: %s", buf);
+	gt_trnt_getfsize(status->total_payload_download, buf);
+	gt_trnt_getfsize(status->total_wanted, buf2);
+	Console.debug("Downloaded %s / %s", buf, buf2);
 	return 1;
 }
