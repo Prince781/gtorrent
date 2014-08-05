@@ -3,6 +3,7 @@
 
 #include <inttypes.h>
 #include <stdbool.h>
+#include <time.h>
 
 #define LT_STATUS_DIR_LEN	1024
 #define LT_STATUS_LEN		100	// maximum status string length
