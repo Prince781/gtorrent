@@ -25,6 +25,7 @@
 # Test files
 *.torrent
 *.log
+gTorrent
 
 # Vim files
 .*.swp
