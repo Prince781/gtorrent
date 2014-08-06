@@ -15,7 +15,7 @@ green		= '\e[1;32m'
 nc		= '\e[0m'
 
 all: gtorrent.o $(LTWRAPPER) $(GUILIB)
-	@echo -e ${red}Building everything...${nc}
+	@echo -e ${green}Building everything...${nc}
 	$(CXX) $(CFLAGS) gtorrent.o $(LTWRAPPER) $(GUILIB) -o $(GTORRENT) $(LDLIBS)
 clean:
 	$(RM) *.o $(GTORRENT)
