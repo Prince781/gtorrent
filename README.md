@@ -11,6 +11,8 @@ distinction between `gtorrent-core` and `gtorrent-gtk`; everything is in one
 program. This is intended to be nothing more than a standalone application 
 without emphasis on unnecessary "modularity" (eg. having gtorrent-core).
 
+[Here is a list of remaining items.](TODO.md)
+
 ## Dependencies
 I haven't put in a suitable dependency satisfaction tool in yet for this repo, 
 so there isn't much useful debug output when trying to build things the first 
