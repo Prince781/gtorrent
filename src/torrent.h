@@ -11,6 +11,7 @@ typedef struct gt_trnt {	// simplified torrent object
 	torrent_info		*ti;
 	torrent_handle		*th;
 	int	(*call)(gt_alert *);	// alert callback
+	void			*data;	// custom data to hold in gt_torrent
 	gt_torrent		*next;	// pointer to next item in list
 } gt_torrent;
 
@@ -25,6 +26,13 @@ void		gt_trnt_getrate		(uint64_t rsize, char *s);
 
 /* @gt_trnt_getstate(): converts state value to string format */
 void		gt_trnt_getstate	(enum torrent_state state, char *s);
+
+/* @gt_trnt_geteta(): approximates estimated time (in sec) remaining */
+uint64_t	gt_trnt_geteta		(uint64_t rate, uint64_t done, 
+					 uint64_t total);
+
+/* @gt_trnt_geteta_fmt(): format ETA (in seconds) to string */
+void		gt_trnt_geteta_fmt	(char *s, uint64_t sec);
 
 /* @gt_trnt_create(): create a simple gt_torrent from a file (possible magnet
  * link) and a save path for the downloaded data. */

@@ -52,8 +52,54 @@ const char *lt_trnt_params_get_name(torrent_params *tp) {
 		(tp)->name.c_str();
 }
 
+void lt_trnt_params_set_flags(torrent_params *tp, uint64_t flags) {
+	reinterpret_cast<libtorrent::add_torrent_params*>(tp)->flags = flags;
+}
+
 bool lt_trnt_handle_is_valid(torrent_handle *th) {
 	return reinterpret_cast<libtorrent::torrent_handle*>(th)->is_valid();
+}
+
+void lt_trnt_handle_pause(torrent_handle *th) {
+	reinterpret_cast<libtorrent::torrent_handle*>(th)->pause();
+}
+
+void lt_trnt_handle_resume(torrent_handle *th) {
+	reinterpret_cast<libtorrent::torrent_handle*>(th)->resume();
+}
+
+void lt_trnt_handle_set_priority(torrent_handle *th, int prio) {
+	reinterpret_cast<libtorrent::torrent_handle*>(th)->set_priority(prio);
+}
+
+void lt_trnt_handle_set_upload_limit(torrent_handle *th, int bytes) {
+	reinterpret_cast<libtorrent::torrent_handle*>
+		(th)->set_upload_limit(bytes);
+}
+
+int lt_trnt_handle_get_upload_limit(torrent_handle *th) {
+	return reinterpret_cast<libtorrent::torrent_handle*>
+		(th)->upload_limit();
+}
+
+void lt_trnt_handle_set_download_limit(torrent_handle *th, int bytes) {
+	reinterpret_cast<libtorrent::torrent_handle*>
+		(th)->set_download_limit(bytes);
+}
+
+int lt_trnt_handle_get_download_limit(torrent_handle *th) {
+	return reinterpret_cast<libtorrent::torrent_handle*>
+		(th)->download_limit();
+}
+
+void lt_trnt_handle_set_max_connections(torrent_handle *th, int max) {
+	reinterpret_cast<libtorrent::torrent_handle*>
+		(th)->set_max_connections(max);
+}
+
+void lt_trnt_handle_set_super_seeding(torrent_handle *th, bool v) {
+	reinterpret_cast<libtorrent::torrent_handle*>
+		(th)->super_seeding(v);
 }
 
 void lt_trnt_handle_destroy(torrent_handle *th) {
@@ -70,7 +116,9 @@ torrent_status *lt_trnt_handle_get_status(torrent_handle *th) {
 
 static void
 lt_trnt_status_cnvt(libtorrent::torrent_handle *th, torrent_status *ts) {
-	libtorrent::torrent_status tstat = th->status();
+	libtorrent::torrent_status tstat = 
+		th->status(libtorrent::torrent_handle::query_name
+			| libtorrent::torrent_handle::query_save_path);
 
 	strncpy(ts->error, tstat.error.c_str(), LT_STATUS_LEN-1);
 	ts->error[LT_STATUS_LEN-1] = '\0';
@@ -97,6 +145,7 @@ lt_trnt_status_cnvt(libtorrent::torrent_handle *th, torrent_status *ts) {
 	TSTATE_ASSIGN(ts,tstat,download_rate,int);
 	TSTATE_ASSIGN(ts,tstat,upload_rate,int);
 	TSTATE_ASSIGN(ts,tstat,download_payload_rate,int);
+	TSTATE_ASSIGN(ts,tstat,upload_payload_rate,int);
 	TSTATE_ASSIGN(ts,tstat,num_seeds,int);
 	TSTATE_ASSIGN(ts,tstat,num_peers,int);
 	TSTATE_ASSIGN(ts,tstat,num_complete,int);

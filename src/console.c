@@ -48,5 +48,5 @@ static void gt_get_ts(char *str) {
 	time_t t = time(NULL);
 	struct tm *lt = localtime(&t);
 	*str = '\0';
-	strftime(str, CONSOLE_MAX_TS_SIZE, "%Y-%b-%d @ %I:%M:%S", lt);
+	strftime(str, CONSOLE_MAX_TS_SIZE, "%Y-%b-%d @ %r", lt);
 }

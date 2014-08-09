@@ -1,16 +1,13 @@
 // core.c
 #include <string.h>
 #include <stdlib.h>
-#include <time.h>
 #include "core.h"
 #include "console.h"
 
-static session *ses;			// the global session for gtorrent
+static session *ses = NULL;		// the global session for gtorrent
 static int (*resp)(gt_alert *);		// session callback function
 static alert_deque *alerts;		// vector of session alerts to pop
 static gt_torrent *tbase;		// base pointer to next torrent
-
-static struct timespec interv;		// update interval
 
 static void gt_core_trntlist_destroy(gt_torrent **);
 static void gt_core_alert_convert(gt_alert *, alert *);
@@ -28,13 +25,15 @@ char *gt_core_get_savepath(char *str) {
 	return str;
 }
 
+session *gt_core_get_session(void) {
+	return ses;
+}
+
 void gt_core_session_start(int x, int y) {
 	ses = lt_session_create();
 	resp = NULL;
 	alerts = lt_alert_deque_create();
 	tbase = NULL;
-	interv.tv_sec = 0;
-	interv.tv_nsec = 500000000L;
 
 	lt_session_listen_on(ses, x, y);
 	// for debug
@@ -49,6 +48,7 @@ void gt_core_session_end(void) {
 	if (tbase != NULL)
 		gt_core_trntlist_destroy(&tbase);
 	lt_session_destroy(ses);
+	ses = NULL;
 }
 
 static void gt_core_trntlist_destroy(gt_torrent **p) {
@@ -56,7 +56,7 @@ static void gt_core_trntlist_destroy(gt_torrent **p) {
 		gt_core_trntlist_destroy(&(*p)->next);
 	(*p)->next = NULL;
 	lt_session_remove_torrent(ses, (*p)->th);
-//	gt_trnt_destroy(*p);
+//	gt_trnt_destroy(*p); TODO: fix
 }
 
 void gt_core_session_set_callback(int (*f)(gt_alert *)) {
@@ -99,6 +99,8 @@ gt_torrent *gt_core_session_remove_torrent(gt_torrent *t) {
 }
 
 int gt_core_session_update(void) {
+	if (ses == NULL)
+		return -1;
 	static gt_alert gtorrent_alert;
 	alert *al;
 	uint64_t i;
@@ -120,7 +122,7 @@ int gt_core_session_update(void) {
 			(*resp)(&gtorrent_alert);
 	}
 
-	return nanosleep(&interv, NULL);
+	return 1;	// TODO: check for session validity
 }
 
 static void gt_core_alert_convert(gt_alert *ga, alert *a) {

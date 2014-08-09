@@ -11,6 +11,22 @@
 struct torrent_params;	// libtorrent::add_torrent_params
 typedef struct torrent_params torrent_params;
 
+enum torrent_flags {	// libtorrent::add_torrent_params::flags_t
+	flag_seed_mode			= 0x0001,
+	flag_override_resume_data	= 0x0002,
+	flag_upload_mode		= 0x0004,
+	flag_share_mode			= 0x0008,
+	flag_apply_ip_filter		= 0x0010,
+	flag_paused			= 0x0020,
+	flag_auto_managed		= 0x0040,
+	flag_duplicate_is_error		= 0x0080,
+	flag_merge_resume_trackers	= 0x0100,
+	flag_update_subscribe		= 0x0200,
+	flag_super_seeding		= 0x0400,
+	flag_sequential_download	= 0x0800,
+	flag_use_resume_save_path	= 0x1000
+};
+
 struct torrent_info;	// libtorrent::torrent_info
 typedef struct torrent_info torrent_info;
 
@@ -60,6 +76,7 @@ struct trnt_stat_tag {	// libtorrent::torrent_status
 	int			download_rate;
 	int			upload_rate;
 	int			download_payload_rate;
+	int			upload_payload_rate;
 	int			num_seeds;
 	int			num_peers;
 	int			num_complete;
@@ -124,13 +141,51 @@ torrent_info	*lt_trnt_info_create		(const char *path);
 void		lt_trnt_info_destroy		(torrent_info *ti);
 
 /* @lt_trnt_params_set_info(): set torrent info of torrent_params */
-void		lt_trnt_params_set_info	(torrent_params *tp, torrent_info *ti);
+void		lt_trnt_params_set_info		(torrent_params *tp,
+						 torrent_info *ti);
 
 /* @lt_trnt_params_get_name(): get name of torrent params */
 const char	*lt_trnt_params_get_name	(torrent_params *tp);
 
+/* @lt_trnt_params_set_flags(): set bitmask flags (torrent_flags) */
+void		lt_trnt_params_set_flags	(torrent_params *tp, 
+						 uint64_t flags);
+
 /* @lt_trnt_handle_is_valid(): determine if torrent handle is valid */
 bool		lt_trnt_handle_is_valid		(torrent_handle *th);
+
+/* @lt_trnt_handle_pause(): pause an individual torrent */
+void		lt_trnt_handle_pause		(torrent_handle *th);
+
+/* @lt_trnt_handle_resume(): resume an individual torrent */
+void		lt_trnt_handle_resume		(torrent_handle *th);
+
+/* @lt_trnt_handle_set_priority(): set torrent priority */
+void		lt_trnt_handle_set_priority	(torrent_handle *th, int prio);
+
+/* @lt_trnt_handle_set_upload_limit(): set torrent upload limit in bytes/s */
+void		lt_trnt_handle_set_upload_limit	(torrent_handle *th,
+						 int bytes);
+
+/* @lt_trnt_handle_get_upload_limit(): get torrent upload limit in bytes/s */
+int		lt_trnt_handle_get_upload_limit	(torrent_handle *th);
+
+/* @lt_trnt_handle_set_download_limit(): set torrent download limit in
+ * bytes/s */
+void	lt_trnt_handle_set_download_limit	(torrent_handle *th,
+						 int bytes);
+
+/* @lt_trnt_handle_get_download_limit(): get torrent download limit in
+ * bytes/s */
+int	lt_trnt_handle_get_download_limit	(torrent_handle *th);
+
+/* @lt_trnt_handle_set_max_connections(): set maximum connections for this
+ * torrent */
+void	lt_trnt_handle_set_max_connections	(torrent_handle *th, int max);
+
+/* @lt_trnt_handle_set_super_seeding(): toggle super seeding for this
+ * torrent */
+void	lt_trnt_handle_set_super_seeding	(torrent_handle *th, bool v);
 
 /* @lt_trnt_handle_destroy(): destroys a torrent_handle that was allocated
  * by a call to lt_session_add_torrent() */

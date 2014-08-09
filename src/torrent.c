@@ -12,6 +12,15 @@
 #define GIGABYTE	1000000000
 #define TERABYTE	1000000000000
 
+// time blocks in seconds
+#define WEEK	604800
+#define DAY	86400
+#define HOUR	3600
+#define MINUTE	60
+
+// not auto-managed by default
+static uint64_t default_flags = /* flag_paused | */flag_update_subscribe;
+
 /* @default_trnt_callback: default callback for torrents */
 static int default_trnt_callback(gt_alert *a);
 
@@ -70,26 +79,60 @@ void gt_trnt_getstate(enum torrent_state state, char *s) {
 	}
 }
 
+uint64_t gt_trnt_geteta(uint64_t rate, uint64_t done, uint64_t total) {
+	return (total - done) / (rate == 0 ? 1 : rate);
+}
+
+void gt_trnt_geteta_fmt(char *s, uint64_t sec) {
+	*s = '\0';
+	if (sec / WEEK) {
+		s += sprintf(s,
+			sec/WEEK > 1 ? "%"PRIu64" weeks, ":"%"PRIu64" week, ",
+			sec/WEEK);
+		sec %= WEEK;
+	}
+	if (sec / DAY) {
+		s += sprintf(s,
+			sec/DAY > 1 ? "%"PRIu64" days, " : "%"PRIu64" day, ",
+			sec/DAY);
+		sec %= DAY;
+	}
+	if (sec / HOUR) {
+		s += sprintf(s,
+			sec/HOUR > 1 ? "%"PRIu64" hrs, " : "%"PRIu64" hr, ",
+			sec/HOUR);
+		sec %= HOUR;
+	}
+	if (sec / MINUTE) {
+		s += sprintf(s, "%"PRIu64" min, ", sec/MINUTE);
+		sec %= MINUTE;
+	}
+	sprintf(s, "%"PRIu64" sec", sec);
+}
+
 gt_torrent *gt_trnt_create(char *file, char *save_path) {
 	gt_torrent *gtp = (gt_torrent *) malloc(sizeof(gt_torrent));
 
 	if (gtp == NULL)
 		return NULL;
 
+	char savepath[1024];
 	gtp->tp = lt_trnt_params_create();
 	gtp->ti = lt_trnt_info_create(file);
 
 	if (save_path != NULL)
 		lt_trnt_params_set_savepath(gtp->tp, save_path);
 	else {
-		char savepath[1024];
 		lt_trnt_params_set_savepath(gtp->tp,
 			gt_core_get_savepath(savepath));
+		save_path = savepath;
 	}
 
 	Console.debug("Saving %s in directory %s...", file, save_path);
 	lt_trnt_params_set_info(gtp->tp, gtp->ti);
+	lt_trnt_params_set_flags(gtp->tp, default_flags);
 	gtp->call = default_trnt_callback;
+	gtp->data = NULL;
 	gtp->next = NULL;
 
 	return gtp;

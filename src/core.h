@@ -14,6 +14,9 @@ int 		gt_core_is_maglink		(const char *url);
 /* @gt_core_get_savepath(): gets the default user save directory */
 char 		*gt_core_get_savepath		(char *str);
 
+/* @gt_core_session_get(): returns a pointer to the session */
+session		*gt_core_get_session		(void);
+
 /* @gt_core_session_start(): starts gtorrent session and takes care of
  * libtorrent functionality. x and y are default listening ports */
 void		gt_core_session_start		(int x, int y);
