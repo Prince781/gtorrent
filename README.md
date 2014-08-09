@@ -1,6 +1,10 @@
 gtorrent
 ========
 
+![alpha-shot2](res/screenshots/alpha2.png)
+
+![alpha-shot3](res/screenshots/alpha3.png)
+
 Fork of original gTorrent, with everything written in straight C, save the 
 wrapper to libtorrent-rasterbar, which is written in C++. This repo has no 
 distinction between `gtorrent-core` and `gtorrent-gtk`; everything is in one 
