@@ -1,0 +1,78 @@
+/* style.css
+ * Style sheet for GTK UI of gTorrent. */
+
+/* torrent list holder */
+GtkScrolledWindow#trnt_list_holder {
+	box-shadow: inset 0 -3px 18px alpha(@borders, 0.4);
+}
+
+/* torrent list box (holds torrent list) */
+GtkBox#trnt_list_box {
+/*	background-color: rgb(215,218,215); */
+	background-image: url("res/noise_overlay.png");
+}
+
+/* torrent list */
+GtkListBox#mw_torrentlist {
+}
+
+@define-color trnt_bg_color lighter(@theme_bg_color);
+
+/* torrent list (contains rows of torrent statuses */
+GtkListBox#mw_torrentlist > GtkListBoxRow {
+	border: 1px solid lighter(@borders);
+	border-top: none;
+	background-color: shade(@trnt_bg_color, 0.924);
+}
+
+GtkListBox#mw_torrentlist > GtkListBoxRow:selected {
+	background-color: @trnt_bg_color;
+	color: @theme_fg_color;
+}
+
+/*
+GtkListBox#mw_torrentlist > GtkListBoxRow:selected GtkButton {
+	border-style: solid;
+	border-width: 1px;
+	color: white;
+	background-image: linear-gradient(to bottom, #5f9ddd,
+					  #4a90d9 40%, #3583d5);
+	border-color: #1c5187;
+	text-shadow: 0 -1px rgba(0, 0, 0, 0.54353);
+	icon-shadow: 0 -1px rgba(0, 0, 0, 0.54353);
+	box-shadow: inset 0 1px rgba(255, 255, 255, 0.1); 
+}
+
+GtkListBox#mw_torrentlist > GtkListBoxRow:selected GtkButton:hover {
+	border-style: solid;
+	color: white;
+	border-color: #1c5187;
+	background-image: linear-gradient(to bottom, #85b4e5,
+					  #5b9add 40%, #4a90d9);
+	text-shadow: 0 -1px rgba(0, 0, 0, 0.51153);
+	icon-shadow: 0 -1px rgba(0, 0, 0, 0.51153);
+	box-shadow: inset 0 1px rgba(255, 255, 255, 0.1); 
+}
+
+GtkListBox#mw_torrentlist > GtkListBoxRow:selected GtkButton:active {
+	border-style: solid;
+	color: white;
+	border-color: #1c5187;
+	background-image: linear-gradient(to bottom, #2b79cb, #3583d5);
+	text-shadow: 0 -1px rgba(0, 0, 0, 0.62353);
+	icon-shadow: 0 -1px rgba(0, 0, 0, 0.62353);
+	box-shadow: inset 0 1px rgba(0, 0, 0, 0.07),
+		    inset 0 2px 1px -2px rgba(0, 0, 0, 0.6);
+}
+*/
+
+/* torrent info */
+GtkBox#trnt_info {
+	background-color: lighter(lighter(@borders));
+}
+
+
+/* torrent statistics */
+GtkBox#tstats {
+	background-color: shade(lighter(lighter(@borders)), 0.92);
+}
