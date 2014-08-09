@@ -17,7 +17,7 @@ so there isn't much useful debug output when trying to build things the first
 time. These should be the necessary libs:
 * GTK+ 3.12 or newer
 * boost (boost-system)
-* [libtorrent-rasterbar](http://www.rasterbar.com/products/libtorrent/)
+* [libtorrent-rasterbar](http://www.rasterbar.com/products/libtorrent/) 1.0.0 or newer
 
 Both may be easily installed on a standard \*nix machine, but if not (or if 
 using Windows), you may have to compile either.
