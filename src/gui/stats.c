@@ -31,7 +31,7 @@ static void init_base(void) {
 	
 	for (i=0; i<STATSIZE; ++i) {
 		*p = (struct sess_stat *) malloc(sizeof(struct sess_stat));
-		(*p)->val = -1;
+		(*p)->val = 0;
 		(*p)->next = NULL;
 		p = &(*p)->next;
 	}

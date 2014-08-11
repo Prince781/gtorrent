@@ -72,6 +72,9 @@ void gt_gui_activate(GApplication *app, gpointer user_data) {
 // populate headerbar and initialize
 static void headerbar_populate(GtkWidget *hb) {
 	GtkWidget *add_torrent, *magnet_dl, *pause, *settings;
+	GtkWidget *magnet_dl_icon;
+	GtkWidget *magnet_dl_popover;
+	GtkWidget *magnet_dl_entry;
 
 	// initialize buttons
 	add_torrent = gtk_button_new_from_icon_name("list-add-symbolic",
@@ -79,24 +82,37 @@ static void headerbar_populate(GtkWidget *hb) {
 	gtk_button_set_focus_on_click(GTK_BUTTON(add_torrent), FALSE);
 	gtk_widget_set_tooltip_text(add_torrent, "Add a torrent");
 
-	magnet_dl = gtk_button_new_from_icon_name("find-location-symbolic",
+	magnet_dl = gtk_menu_button_new();
+	magnet_dl_icon = gtk_image_new_from_icon_name("edit-paste-symbolic",
 						  GTK_ICON_SIZE_BUTTON);
+	gtk_button_set_image(GTK_BUTTON(magnet_dl), magnet_dl_icon);
 	gtk_button_set_focus_on_click(GTK_BUTTON(magnet_dl), FALSE);
 	gtk_widget_set_tooltip_text(magnet_dl, "Enter magnet link");
 
+	// magnet link button - popover
+	magnet_dl_popover = gtk_popover_new(magnet_dl);
+	gtk_menu_button_set_popover(GTK_MENU_BUTTON(magnet_dl),
+				    magnet_dl_popover);
+	magnet_dl_entry = gtk_entry_new();
+	gtk_container_add(GTK_CONTAINER(magnet_dl_popover), magnet_dl_entry);
+	gtk_widget_show(magnet_dl_entry);
+
+	// pause and settings button
 	pause = gtk_button_new_from_icon_name("media-playback-start-symbolic",
 					      GTK_ICON_SIZE_BUTTON);
 	gtk_button_set_focus_on_click(GTK_BUTTON(pause), FALSE);
 	gtk_widget_set_sensitive(pause, FALSE);	// disable initially
 
-	settings = gtk_button_new_from_icon_name("format-justify-fill-symbolic",
+	settings = gtk_button_new_from_icon_name("emblem-system-symbolic",
 					      GTK_ICON_SIZE_BUTTON);
 	gtk_button_set_focus_on_click(GTK_BUTTON(settings), FALSE);
 	gtk_widget_set_tooltip_text(settings, "Settings");
 	
-	// TODO: set more callback functions
+	// callback functions
 	g_signal_connect(add_torrent, "clicked", 
 			 G_CALLBACK(gt_gui_add_torrent), NULL);
+	g_signal_connect(magnet_dl_entry, "activate",
+			 G_CALLBACK(gt_gui_add_magnet), magnet_dl_popover);
 
 	// pack buttons
 	gtk_header_bar_pack_start(GTK_HEADER_BAR(hb), add_torrent);

@@ -23,9 +23,29 @@ void gt_gui_add_torrent(GtkButton *button, gpointer data) {
 		char *fname = gtk_file_chooser_get_filename(
 				GTK_FILE_CHOOSER(chooser));
 		gt_torrent *gtp = gt_trnt_create(fname, NULL);
-		gt_gui_add_torrent_item(GTK_LIST_BOX(mw_torrentlist), gtp);
+		if (gtp != NULL)
+			gt_gui_add_torrent_item(GTK_LIST_BOX(mw_torrentlist),
+						gtp);
 		g_free(fname);
 	}
 
 	gtk_widget_destroy(chooser);
+}
+
+void gt_gui_add_magnet(GtkEntry *entry, gpointer data) {
+	extern GtkWidget *mw_torrentlist;
+	GtkWidget *popover = (GtkWidget *) data;
+	gt_torrent *gtp;
+	const char *link;
+
+	if (!gt_core_is_maglink(link = gtk_entry_get_text(entry)))
+		Console.error("\"%s\": not a magnet link", link);
+	else {
+		gtp = gt_trnt_create(link, NULL);
+		if (gtp != NULL)
+			gt_gui_add_torrent_item(GTK_LIST_BOX(mw_torrentlist),
+						gtp);
+	}
+
+	gtk_widget_hide(popover);
 }

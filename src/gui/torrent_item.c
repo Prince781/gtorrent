@@ -19,10 +19,18 @@ static void trnt_open_folder(GSimpleAction *, GVariant *, gpointer);
 /* @trnt_update(): post update messages for torrent */
 static int trnt_update(gt_alert *);
 
+/* @trnt_item_destroy(): cause widgets and torrent object to destroy */
+static void trnt_item_destroy(GtkButton *, gpointer);
+
 /* @trnt_destroy(): destroy gt_torrent object upon widget destruction */
 static void trnt_destroy(gpointer);
 
 void gt_gui_add_torrent_item(GtkListBox *listbox, gt_torrent *gtp) {
+	if (! gt_core_session_add_torrent(gtp)) {
+		gt_trnt_destroy(gtp);
+		return;
+	}
+
 	trnt_widgets *widgets = malloc(sizeof(trnt_widgets));
 
 	GtkWidget *row;
@@ -127,7 +135,6 @@ void gt_gui_add_torrent_item(GtkListBox *listbox, gt_torrent *gtp) {
 	gtk_box_pack_start(GTK_BOX(box), options_button, FALSE, FALSE, 0);
 
 	// delete button
-	// TODO: add delete event
 	delete_button = gtk_button_new_from_icon_name(
 		"user-trash-symbolic", GTK_ICON_SIZE_BUTTON);
 	gtk_widget_set_tooltip_text(delete_button, "Remove");
@@ -135,6 +142,10 @@ void gt_gui_add_torrent_item(GtkListBox *listbox, gt_torrent *gtp) {
 	gtk_widget_set_margin_bottom(delete_button, 10);
 	gtk_widget_set_margin_end(delete_button, 15);
 	gtk_widget_set_can_default(delete_button, TRUE);
+
+	g_signal_connect(delete_button, "clicked",
+			 G_CALLBACK(trnt_item_destroy), row);
+
 	gtk_box_pack_end(GTK_BOX(box), delete_button, FALSE, FALSE, 0);
 
 	// add torrent association
@@ -145,8 +156,6 @@ void gt_gui_add_torrent_item(GtkListBox *listbox, gt_torrent *gtp) {
 	widgets->progress = GTK_PROGRESS_BAR(trnt_progress);
 	gtp->data = (void *) widgets;
 
-	gtp->call = trnt_update;
-
 	g_object_set_data_full(G_OBJECT(row), "torrent", (gpointer) gtp,
 			       trnt_destroy);
 
@@ -154,8 +163,8 @@ void gt_gui_add_torrent_item(GtkListBox *listbox, gt_torrent *gtp) {
 	gtk_list_box_prepend(listbox, row);
 	gtk_widget_show_all(GTK_WIDGET(listbox));
 
-	if (! gt_core_session_add_torrent(gtp))
-		Console.error("Could not add torrent!");
+	// set callback
+	gtp->call = trnt_update;
 }
 
 gboolean gt_gui_trnt_post_statistics(gpointer listbox) {
@@ -326,6 +335,10 @@ static int trnt_update(gt_alert *ga) {
 	return 1;
 }
 
+static void trnt_item_destroy(GtkButton *button, gpointer data) {
+	gtk_widget_destroy(GTK_WIDGET(data));
+}
+
 static void trnt_destroy(gpointer gt) {
 	gt_torrent *gtp = (gt_torrent *) gt;
 
@@ -333,5 +346,5 @@ static void trnt_destroy(gpointer gt) {
 	gt_core_session_remove_torrent(gtp);
 	free(gtp->data);
 	gtp->data = NULL;
-	// TODO: call gt_trnt_destroy() here
+	gt_trnt_destroy(gtp);
 }
