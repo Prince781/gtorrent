@@ -61,12 +61,13 @@ void gt_gui_activate(GApplication *app, gpointer user_data) {
 		mw_torrentlist); 
 
 	// set icon
-	if (!gtk_window_set_icon_from_file(GTK_WINDOW(main_window),
-		"res/gtorrent.png", NULL))
-		Console.error("Error setting application window. Could not"
+	if (!gtk_window_set_default_icon_from_file("res/gtorrent.png", NULL))
+		Console.error("Error setting application icon. Could not"
 			      " find %s", "res/gtorrent.png");
 
 	gtk_widget_show_all(main_window);
+
+	// register application actions
 }
 
 // populate headerbar and initialize
@@ -94,6 +95,7 @@ static void headerbar_populate(GtkWidget *hb) {
 	gtk_menu_button_set_popover(GTK_MENU_BUTTON(magnet_dl),
 				    magnet_dl_popover);
 	magnet_dl_entry = gtk_entry_new();
+	gtk_widget_set_tooltip_text(magnet_dl_entry, "Enter magnet link");
 	gtk_container_add(GTK_CONTAINER(magnet_dl_popover), magnet_dl_entry);
 	gtk_widget_show(magnet_dl_entry);
 
