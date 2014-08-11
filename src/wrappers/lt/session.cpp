@@ -42,8 +42,17 @@ torrent_handle *lt_session_add_torrent(session *s, torrent_params *tp) {
 	libtorrent::add_torrent_params *torp
 		= reinterpret_cast<libtorrent::add_torrent_params*>(tp);
 	libtorrent::torrent_handle *th = new libtorrent::torrent_handle();
-	*th = ses->add_torrent(*torp);
-	return reinterpret_cast<torrent_handle*>(th);
+
+	try {
+		*th = ses->add_torrent(*torp);
+		return reinterpret_cast<torrent_handle*>(th);
+	} catch (libtorrent::libtorrent_exception& e) {
+		boost::system::error_code ec = e.error();
+		if (ec.category() == libtorrent::get_libtorrent_category()
+		 && ec.value() != libtorrent::errors::duplicate_torrent)
+			delete th;	// delete only if unique
+		return NULL;
+	}
 }
 
 void lt_session_remove_torrent(session *s, torrent_handle *th) {
@@ -54,7 +63,6 @@ void lt_session_remove_torrent(session *s, torrent_handle *th) {
 	torh = reinterpret_cast<libtorrent::torrent_handle*>(th);
 
 	ses->remove_torrent(*torh);
-	
 }
 
 session_status *lt_session_get_status(session *s) {

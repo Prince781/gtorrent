@@ -33,8 +33,12 @@ void lt_trnt_params_set_savepath(torrent_params *tp, const char *path) {
 }
 
 torrent_info *lt_trnt_info_create(const char *path) {
-	return reinterpret_cast<torrent_info*>
-		(new libtorrent::torrent_info(std::string(path)));
+	try {
+		return reinterpret_cast<torrent_info*>
+			(new libtorrent::torrent_info(std::string(path)));
+	} catch (libtorrent::libtorrent_exception& e) {
+		return NULL;
+	}
 }
 
 void lt_trnt_info_destroy(torrent_info *ti) {
@@ -45,6 +49,12 @@ void lt_trnt_params_set_info(torrent_params *tp, torrent_info *ti) {
 	libtorrent::add_torrent_params *torp
 		= reinterpret_cast<libtorrent::add_torrent_params*>(tp);
 	torp->ti = reinterpret_cast<libtorrent::torrent_info*>(ti);
+}
+
+void lt_trnt_params_set_url(torrent_params *tp, const char *url) {
+	libtorrent::add_torrent_params *torp
+		= reinterpret_cast<libtorrent::add_torrent_params*>(tp);
+	torp->url = std::string(url);
 }
 
 const char *lt_trnt_params_get_name(torrent_params *tp) {

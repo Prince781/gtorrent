@@ -56,7 +56,7 @@ static void gt_core_trntlist_destroy(gt_torrent **p) {
 		gt_core_trntlist_destroy(&(*p)->next);
 	(*p)->next = NULL;
 	lt_session_remove_torrent(ses, (*p)->th);
-//	gt_trnt_destroy(*p); TODO: fix
+	gt_trnt_destroy(*p);
 }
 
 void gt_core_session_set_callback(int (*f)(gt_alert *)) {
@@ -71,16 +71,21 @@ int gt_core_session_add_torrent(gt_torrent *t) {
 	gt_torrent **p;
 	
 	for (p = &tbase; *p != t && *p != NULL; p = &(*p)->next);
+		
 	if (*p == t) {
 		Console.error("%s: attempting to add duplicate torrent.",
 				"gt_core_session_add_torrent");
 		return 0;
-	} else
+	} else if ((t->th = lt_session_add_torrent(ses, t->tp)) == NULL) {
+		Console.error("%s: could not add torrent.",
+				"gt_core_session_add_torrent");
+		return 0;
+	} else {
 		Console.debug("Added a torrent successfully.");
-	*p = t;
-	t->next = NULL;
-	t->th = lt_session_add_torrent(ses, t->tp);
-	return 1;
+		*p = t;
+		t->next = NULL;
+		return 1;
+	}
 }
 
 gt_torrent *gt_core_session_remove_torrent(gt_torrent *t) {

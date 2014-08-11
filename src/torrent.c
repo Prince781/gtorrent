@@ -19,7 +19,8 @@
 #define MINUTE	60
 
 // not auto-managed by default
-static uint64_t default_flags = /* flag_paused | */flag_update_subscribe;
+static uint64_t default_flags = /* flag_paused | */flag_update_subscribe
+				| flag_duplicate_is_error;
 
 /* @default_trnt_callback: default callback for torrents */
 static int default_trnt_callback(gt_alert *a);
@@ -30,20 +31,29 @@ void gt_trnt_gettime(uint64_t t, char *s) {
 }
 
 void gt_trnt_getfsize(uint64_t fsize, char *s) {
+	gt_trnt_getfsizep(fsize, 4, s);
+}
+
+void gt_trnt_getfsizep(uint64_t fsize, int p, char *s) {
 	if (fsize / TERABYTE)
-		sprintf(s, "%.3lf TB", fsize / (double)TERABYTE);
+		sprintf(s, "%.*g TB", p, fsize / (double)TERABYTE);
 	else if (fsize / GIGABYTE)
-		sprintf(s, "%.3lf GB", fsize / (double)GIGABYTE);
+		sprintf(s, "%.*g GB", p, fsize / (double)GIGABYTE);
 	else if (fsize / MEGABYTE)
-		sprintf(s, "%.3lf MB", fsize / (double)MEGABYTE);
+		sprintf(s, "%.*g MB", p, fsize / (double)MEGABYTE);
 	else if (fsize / KILOBYTE)
-		sprintf(s, "%.3lf kB", fsize / (double)KILOBYTE);
+		sprintf(s, "%.*g kB", p, fsize / (double)KILOBYTE);
 	else
 		sprintf(s, "%u B", (unsigned) fsize);
 }
 
 void gt_trnt_getrate(uint64_t rsize, char *s) {
 	gt_trnt_getfsize(rsize, s);
+	strcat(s, "/s");
+}
+
+void gt_trnt_getratep(uint64_t rsize, int p, char *s) {
+	gt_trnt_getfsizep(rsize, p, s);
 	strcat(s, "/s");
 }
 
@@ -110,15 +120,34 @@ void gt_trnt_geteta_fmt(char *s, uint64_t sec) {
 	sprintf(s, "%"PRIu64" sec", sec);
 }
 
-gt_torrent *gt_trnt_create(char *file, char *save_path) {
-	gt_torrent *gtp = (gt_torrent *) malloc(sizeof(gt_torrent));
-
-	if (gtp == NULL)
-		return NULL;
-
+gt_torrent *gt_trnt_create(const char *file, char *save_path) {
+	gt_torrent *gtp;
 	char savepath[1024];
+
+	if ((gtp = (gt_torrent *)malloc(sizeof(gt_torrent))) == NULL)
+		return NULL;
+	gtp->tp = NULL;
+	gtp->ti = NULL;
+	gtp->th = NULL;
+	gtp->url = NULL;
+	gtp->call = NULL;
+	gtp->data = NULL;
+	gtp->next = NULL;
+
 	gtp->tp = lt_trnt_params_create();
-	gtp->ti = lt_trnt_info_create(file);
+	if (gt_core_is_maglink(file)) {
+		gtp->url = strdup(file);
+		gtp->ti = NULL;
+	} else {
+		gtp->ti = lt_trnt_info_create(file);
+		gtp->url = NULL;
+		if (gtp->ti == NULL) {
+			Console.error("%s: Could not create torrent.",
+				      "gt_trnt_create");
+			gt_trnt_destroy(gtp);
+			return NULL;
+		}
+	}
 
 	if (save_path != NULL)
 		lt_trnt_params_set_savepath(gtp->tp, save_path);
@@ -128,20 +157,26 @@ gt_torrent *gt_trnt_create(char *file, char *save_path) {
 		save_path = savepath;
 	}
 
-	Console.debug("Saving %s in directory %s...", file, save_path);
-	lt_trnt_params_set_info(gtp->tp, gtp->ti);
+	if (gtp->url != NULL) {
+		Console.debug("Saving torrent in directory %s...", save_path);
+		lt_trnt_params_set_url(gtp->tp, gtp->url);
+	} else {
+		Console.debug("Saving %s in directory %s...", file, save_path);
+		lt_trnt_params_set_info(gtp->tp, gtp->ti);
+	}
 	lt_trnt_params_set_flags(gtp->tp, default_flags);
 	gtp->call = default_trnt_callback;
-	gtp->data = NULL;
-	gtp->next = NULL;
 
 	return gtp;
 }
 
 void gt_trnt_destroy(gt_torrent *t) {
-	lt_trnt_params_destroy(t->tp);
-	lt_trnt_info_destroy(t->ti);
-	lt_trnt_handle_destroy(t->th);
+	if (t->tp != NULL)
+		lt_trnt_params_destroy(t->tp);
+	if (t->url != NULL)
+		free(t->url);
+	if (t->th != NULL)
+		lt_trnt_handle_destroy(t->th);
 	free(t);
 }
 

@@ -137,12 +137,19 @@ void		lt_trnt_params_set_savepath	(torrent_params *tp,
 /* @lt_trnt_info_create(): create torrent info from torrent file location */
 torrent_info	*lt_trnt_info_create		(const char *path);
 
-/* @lt_trnt_info_destroy(): destroy torrent info */
+/* @lt_trnt_info_destroy(): destroy torrent info note that this function 
+ * should not be called after attempting to add a torrent to the session, as
+ * a reference to it is managed internally by libtorrent. The torrent_info
+ * is automatically delete when the session destructor is called. */
 void		lt_trnt_info_destroy		(torrent_info *ti);
 
 /* @lt_trnt_params_set_info(): set torrent info of torrent_params */
 void		lt_trnt_params_set_info		(torrent_params *tp,
 						 torrent_info *ti);
+
+/* @lt_trnt_params_set_url(): set url of torrent_params for links */
+void		lt_trnt_params_set_url		(torrent_params *tp,
+						 const char *url);
 
 /* @lt_trnt_params_get_name(): get name of torrent params */
 const char	*lt_trnt_params_get_name	(torrent_params *tp);
