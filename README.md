@@ -1,9 +1,17 @@
 gtorrent
 ========
 
-![alpha-shot2](res/screenshots/alpha2.png)
+![alpha-shot1](screenshots/alpha1.png)
 
-![alpha-shot3](res/screenshots/alpha3.png)
+![alpha-shot2](screenshots/alpha2.png)
+
+![alpha-shot3](screenshots/alpha3.png)
+
+![alpha-shot4](screenshots/alpha4.png)
+
+![alpha-shot5](screenshots/alpha5.png)
+
+![alpha-shot6](screenshots/alpha6.png)
 
 Fork of original gTorrent, with everything written in straight C, save the 
 wrapper to libtorrent-rasterbar, which is written in C++. This repo has no 
@@ -17,7 +25,7 @@ without emphasis on unnecessary "modularity" (eg. having gtorrent-core).
 I haven't put in a suitable dependency satisfaction tool in yet for this repo, 
 so there isn't much useful debug output when trying to build things the first 
 time. These should be the necessary libs:
-* GTK+ 3.12 or newer
+* GTK+ 3.13 or newer
 * boost (boost-system)
 * [libtorrent-rasterbar](http://www.rasterbar.com/products/libtorrent/) 1.0.0 or newer
 
