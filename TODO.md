@@ -6,7 +6,7 @@ Leftover Items
 - [X] enable delete button
 - [X] enable magnet link button
 - [ ] write UI for managing system-wide settings
-- [ ] add "about" dialog and GtkApplication menu
+- [X] add "about" dialog and GtkApplication menu
 - [ ] enable session pause/play via headerbar button
 - [ ] add DBus notification / possible bell for finished torrents
 - [ ] enable running in the background (like Transmission)

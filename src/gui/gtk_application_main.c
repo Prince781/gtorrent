@@ -10,6 +10,7 @@
 #include <string.h>
 
 GtkApplication *app;
+GdkPixbuf *default_icon, *default_logo;
 
 static void session_start(GApplication *, gpointer);
 static void session_stop(GApplication *, gpointer);
@@ -44,6 +45,16 @@ static void session_start(GApplication *app, gpointer user_data) {
 	};
 	GMenu *app_menu;
 
+	// load pixbufs first
+	if ((default_icon = gdk_pixbuf_new_from_resource(
+		"/org/gt/gTorrent/gtorrent.png", NULL)) == NULL)
+		Console.error("Could not find gtorrent.png");
+	else
+		gtk_window_set_default_icon(default_icon);
+	if ((default_logo = gdk_pixbuf_new_from_resource(
+		"/org/gt/gTorrent/gtorrentlogo.png", NULL)) == NULL)
+		Console.error("Could not find gtorrentlogo.png");
+
 	Console.debug("Initializing core...");
 	gt_core_session_start(GT_CORE_DEFAULT_PORTS());
 	gdk_threads_add_timeout(500, session_update, NULL);
@@ -66,8 +77,12 @@ static gboolean session_update(gpointer data) {
 // session_stop: stop gtorrent session and end items
 static void session_stop(GApplication *app, gpointer user_data) {
 	Console.debug("gTorrent terminating...");
-	gt_core_session_end();
+	if (default_icon != NULL)
+		g_object_unref(default_icon);
+	if (default_logo != NULL)
+		g_object_unref(default_logo);
 	gt_gui_stat_destroy();
+	gt_core_session_end();
 }
 
 static void app_show_about(GSimpleAction *action, GVariant *p, gpointer data) {
@@ -88,7 +103,7 @@ static void app_show_about(GSimpleAction *action, GVariant *p, gpointer data) {
 		"website", "https://github.com/Prince781/gtorrent",
 		"website-label", _("Source on GitHub"),
 		"license-type", GTK_LICENSE_GPL_2_0,
-		"logo", NULL,
+		"logo", default_logo,
 		NULL);
 }
 

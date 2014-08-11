@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<gresources>
+	<gresource prefix="/org/gt/gTorrent/">
+		<file>noise_overlay.png</file>
+		<file>gtorrent.png</file>
+		<file>gtorrentlogo.png</file>
+	</gresource>
+</gresources>

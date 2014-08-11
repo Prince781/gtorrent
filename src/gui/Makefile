@@ -5,7 +5,8 @@ LDFLAGS		= `pkg-config --cflags gtk+-3.0`
 LDLIBS		= `pkg-config --libs gtk+-3.0`
 OBJ		= gui.o
 OBJECTS		= main_window.o gtk_application_main.o torrent_add.o \
-torrent_item.o torrent_properties_window.o stats_graph.o stats.o style.o
+torrent_item.o torrent_properties_window.o stats_graph.o stats.o \
+resources.o style.o
 
 all: $(OBJ)
 
@@ -38,3 +39,7 @@ gtk_application_main.o: gtk_application_main.c
 
 style.o: style.h res/style.css
 	$(LD) -r -b binary -o style.o res/style.css
+
+resources.o:
+	$(MAKE) -C res
+	$(CC) $(CFLAGS) $(LDFLAGS) -c res/resources.c $(LDLIBS)

@@ -60,14 +60,7 @@ void gt_gui_activate(GApplication *app, gpointer user_data) {
 	gdk_threads_add_timeout(1000, gt_gui_trnt_post_statistics,
 		mw_torrentlist); 
 
-	// set icon
-	if (!gtk_window_set_default_icon_from_file("res/gtorrent.png", NULL))
-		Console.error("Error setting application icon. Could not"
-			      " find %s", "res/gtorrent.png");
-
 	gtk_widget_show_all(main_window);
-
-	// register application actions
 }
 
 // populate headerbar and initialize

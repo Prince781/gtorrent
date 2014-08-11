@@ -9,7 +9,7 @@ GtkScrolledWindow#trnt_list_holder {
 /* torrent list box (holds torrent list) */
 GtkBox#trnt_list_box {
 /*	background-color: rgb(215,218,215); */
-	background-image: url("res/noise_overlay.png");
+	background-image: url("resource:///org/gt/gTorrent/noise_overlay.png");
 }
 
 /* torrent list */

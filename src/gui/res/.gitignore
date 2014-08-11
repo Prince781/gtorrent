@@ -1,0 +1,3 @@
+# compiled resource files
+*.c
+*.gresource
