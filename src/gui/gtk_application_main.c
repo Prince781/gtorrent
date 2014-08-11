@@ -1,6 +1,7 @@
 // initialize gTorrent and GTK+
 #include "../core.h"
 #include "../console.h"
+#include "../gtorrent.h"
 #include "main_window.h"
 #include "stats.h"
 #include <gtk/gtk.h>
@@ -100,6 +101,7 @@ static void app_show_about(GSimpleAction *action, GVariant *p, gpointer data) {
 		"comments", _("A simple torrent client built off of"
 			      " libtorrent."),
 		"copyright", _(cright),
+		"version", "v"GTORRENT_VERSION,
 		"website", "https://github.com/Prince781/gtorrent",
 		"website-label", _("Source on GitHub"),
 		"license-type", GTK_LICENSE_GPL_2_0,

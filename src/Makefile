@@ -18,12 +18,12 @@ all: gtorrent.o $(LIBTORRENT) $(GUI)
 	@echo -e ${green}Building everything...${nc}
 	$(CXX) $(CFLAGS) gtorrent.o $(LIBTORRENT) $(GUI) -o $(BIN) $(LDFLAGS)
 clean:
-	$(RM) *.o $(GTORRENT)
+	$(RM) *.o $(BIN)
 	$(MAKE) clean -C wrappers
 	$(MAKE) clean -C gui
 
 # gtorrent.o: console.o core.o torrent.o test.o
-gtorrent.o: console.o core.o torrent.o
+gtorrent.o: console.o core.o torrent.o gtorrent.h
 	$(LD) -r *.o -o gtorrent.o
 
 # other dependencies
