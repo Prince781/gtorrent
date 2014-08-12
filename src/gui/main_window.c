@@ -152,13 +152,15 @@ static void vbox_populate(GtkWidget *vb) {
 
 	// torrent list
 	mw_torrentlist = gtk_list_box_new();
+	gtk_widget_set_margin_start(mw_torrentlist, 100);
+	gtk_widget_set_margin_end(mw_torrentlist, 100);
 	gtk_list_box_set_header_func(GTK_LIST_BOX(mw_torrentlist),
 		tlist_update, NULL, tlist_update_destroy);
 	gtk_widget_set_name(mw_torrentlist, "mw_torrentlist");
 
 	// add widgets to torrent list holder
 	gtk_box_pack_start(GTK_BOX(trnt_list_box), mw_torrentlist, 
-			   FALSE, FALSE, 0);
+			   FALSE, FALSE, 80);
 
 	// add separator
 	trnt_divider = gtk_separator_new(GTK_ORIENTATION_HORIZONTAL);
