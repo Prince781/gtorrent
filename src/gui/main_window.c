@@ -88,6 +88,7 @@ static void headerbar_populate(GtkWidget *hb) {
 	gtk_menu_button_set_popover(GTK_MENU_BUTTON(magnet_dl),
 				    magnet_dl_popover);
 	magnet_dl_entry = gtk_entry_new();
+	gtk_entry_set_width_chars(GTK_ENTRY(magnet_dl_entry), 50);
 	gtk_widget_set_tooltip_text(magnet_dl_entry, "Enter magnet link");
 	gtk_container_add(GTK_CONTAINER(magnet_dl_popover), magnet_dl_entry);
 	gtk_widget_show(magnet_dl_entry);
@@ -151,15 +152,13 @@ static void vbox_populate(GtkWidget *vb) {
 
 	// torrent list
 	mw_torrentlist = gtk_list_box_new();
-	gtk_widget_set_margin_start(mw_torrentlist, 100);
-	gtk_widget_set_margin_end(mw_torrentlist, 100);
 	gtk_list_box_set_header_func(GTK_LIST_BOX(mw_torrentlist),
 		tlist_update, NULL, tlist_update_destroy);
 	gtk_widget_set_name(mw_torrentlist, "mw_torrentlist");
 
 	// add widgets to torrent list holder
 	gtk_box_pack_start(GTK_BOX(trnt_list_box), mw_torrentlist, 
-			   FALSE, FALSE, 80);
+			   FALSE, FALSE, 0);
 
 	// add separator
 	trnt_divider = gtk_separator_new(GTK_ORIENTATION_HORIZONTAL);
