@@ -96,6 +96,7 @@ static void headerbar_populate(GtkWidget *hb) {
 	pause = gtk_button_new_from_icon_name("media-playback-start-symbolic",
 					      GTK_ICON_SIZE_BUTTON);
 	gtk_button_set_focus_on_click(GTK_BUTTON(pause), FALSE);
+	gtk_widget_set_tooltip_text(pause, "Pause session.");
 	gtk_widget_set_sensitive(pause, FALSE);	// disable initially
 
 	settings = gtk_button_new_from_icon_name("emblem-system-symbolic",
