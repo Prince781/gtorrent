@@ -30,7 +30,8 @@ bool lt_session_is_paused(session *s) {
 
 void lt_session_listen_on(session *s, int x, int y) {
 	libtorrent::session *ses = reinterpret_cast<libtorrent::session*>(s);
-	ses->listen_on(std::make_pair(x, y));
+	libtorrent::error_code &ec = *new libtorrent::error_code; // without ec is deprecated
+	ses->listen_on(std::make_pair(x, y), ec);
 }
 
 bool lt_session_is_listening(session *s) {
