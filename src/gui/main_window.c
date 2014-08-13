@@ -15,11 +15,18 @@ GtkWidget *tstats_revealer;	// GtkRevealer around tstats
 GtkWidget *mw_torrentstats;	// GtkGrid containing status widgets
 GtkWidget *mwt_title;		// torrent title (stats)
 GtkWidget *mwt_info[MWT_SIZE];	// torrent info labels
+GtkWidget *mw_pausebutton;	// pause/play session button
 
 static void headerbar_populate(GtkWidget *);
 static void vbox_populate(GtkWidget *);
 static void tlist_update(GtkListBoxRow *, GtkListBoxRow *, gpointer);
 static void tlist_update_destroy(gpointer);
+
+// update main window elements according to session information
+static gboolean gt_gui_mwelems_update(gpointer);
+
+// toggle session paused state
+static void gt_gui_session_pause_toggle(GtkButton *, gpointer);
 
 void gt_gui_activate(GApplication *app, gpointer user_data) {
 	GdkScreen *screen;	// global screen associated with window
@@ -58,14 +65,16 @@ void gt_gui_activate(GApplication *app, gpointer user_data) {
 
 	// set update for torrent statistics
 	gdk_threads_add_timeout(1000, gt_gui_trnt_post_statistics,
-		mw_torrentlist); 
+		mw_torrentlist);
+	// set update for main window elements
+	gdk_threads_add_timeout(1000, gt_gui_mwelems_update, NULL);
 
 	gtk_widget_show_all(main_window);
 }
 
 // populate headerbar and initialize
 static void headerbar_populate(GtkWidget *hb) {
-	GtkWidget *add_torrent, *magnet_dl, *pause, *settings;
+	GtkWidget *add_torrent, *magnet_dl, *settings;
 	GtkWidget *magnet_dl_icon;
 	GtkWidget *magnet_dl_popover;
 	GtkWidget *magnet_dl_entry;
@@ -93,13 +102,15 @@ static void headerbar_populate(GtkWidget *hb) {
 	gtk_container_add(GTK_CONTAINER(magnet_dl_popover), magnet_dl_entry);
 	gtk_widget_show(magnet_dl_entry);
 
-	// pause and settings button
-	pause = gtk_button_new_from_icon_name("media-playback-start-symbolic",
-					      GTK_ICON_SIZE_BUTTON);
-	gtk_button_set_focus_on_click(GTK_BUTTON(pause), FALSE);
-	gtk_widget_set_tooltip_text(pause, "Pause session.");
-	gtk_widget_set_sensitive(pause, FALSE);	// disable initially
+	// session pause/play button
+	mw_pausebutton = gtk_button_new_from_icon_name(
+				"media-playback-pause-symbolic",
+				GTK_ICON_SIZE_BUTTON);
+	gtk_button_set_focus_on_click(GTK_BUTTON(mw_pausebutton), FALSE);
+	g_signal_connect(mw_pausebutton, "clicked",
+			 G_CALLBACK(gt_gui_session_pause_toggle), NULL);
 
+	// settings button
 	settings = gtk_button_new_from_icon_name("emblem-system-symbolic",
 					      GTK_ICON_SIZE_BUTTON);
 	gtk_button_set_focus_on_click(GTK_BUTTON(settings), FALSE);
@@ -114,7 +125,7 @@ static void headerbar_populate(GtkWidget *hb) {
 	// pack buttons
 	gtk_header_bar_pack_start(GTK_HEADER_BAR(hb), add_torrent);
 	gtk_header_bar_pack_start(GTK_HEADER_BAR(hb), magnet_dl);
-	gtk_header_bar_pack_start(GTK_HEADER_BAR(hb), pause);
+	gtk_header_bar_pack_start(GTK_HEADER_BAR(hb), mw_pausebutton);
 	gtk_header_bar_pack_end(GTK_HEADER_BAR(hb), settings);
 
 	// show
@@ -271,4 +282,50 @@ static void tlist_update(GtkListBoxRow *row, GtkListBoxRow *before,
 static void tlist_update_destroy(gpointer data) {
 	if (data != NULL)
 		g_object_unref(data);
+}
+
+// update all important main window elements
+// note: this function should only be set after everything else has been 
+// initialized
+static gboolean gt_gui_mwelems_update(gpointer data) {
+	session *ses;
+	GtkWidget *image;
+
+	ses = gt_core_get_session();
+	if (lt_session_is_paused(ses)) {
+		image = gtk_image_new_from_icon_name(
+			"media-playback-start-symbolic", GTK_ICON_SIZE_BUTTON);
+		gtk_widget_set_tooltip_text(GTK_WIDGET(mw_pausebutton), 
+					    "Resume session");
+		gtk_button_set_image(GTK_BUTTON(mw_pausebutton), image);
+	} else {
+		image = gtk_image_new_from_icon_name(
+			"media-playback-pause-symbolic", GTK_ICON_SIZE_BUTTON);
+		gtk_widget_set_tooltip_text(GTK_WIDGET(mw_pausebutton),
+					    "Pause session");
+		gtk_button_set_image(GTK_BUTTON(mw_pausebutton), image);
+	}
+	return TRUE;
+}
+
+static void gt_gui_session_pause_toggle(GtkButton *button, gpointer data) {
+	session *ses;
+	GtkWidget *image;
+	
+	ses = gt_core_get_session();
+	if (lt_session_is_paused(ses)) {	// resume
+		image = gtk_image_new_from_icon_name(
+			"media-playback-pause-symbolic", GTK_ICON_SIZE_BUTTON);
+		gtk_widget_set_tooltip_text(GTK_WIDGET(button), 
+					    "Pause session");
+		gtk_button_set_image(button, image);
+		lt_session_resume(ses);
+	} else {	// pause
+		image = gtk_image_new_from_icon_name(
+			"media-playback-start-symbolic", GTK_ICON_SIZE_BUTTON);
+		gtk_widget_set_tooltip_text(GTK_WIDGET(button),
+					    "Resume session");
+		gtk_button_set_image(button, image);
+		lt_session_pause(ses);
+	}
 }

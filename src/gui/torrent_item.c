@@ -186,7 +186,7 @@ gboolean gt_gui_trnt_post_statistics(gpointer listbox) {
 				G_OBJECT(selected->data), "torrent");
 		if (gtp == NULL) {
 			Console.error("%s: could not get torrent stats",
-				      "trnt_post_statistics");
+				      "gt_gui_trnt_post_statistics");
 			g_list_free(selected);
 			return TRUE;
 		}
