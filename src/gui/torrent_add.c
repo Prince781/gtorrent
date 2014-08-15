@@ -9,6 +9,7 @@
 void gt_gui_add_torrent(GtkButton *button, gpointer data) {
 	extern GtkWidget *main_window, *mw_torrentlist;
 	GtkWidget *chooser;
+	GtkFileFilter *filter;
 
 	chooser = gtk_file_chooser_dialog_new("Open",
 			GTK_WINDOW(main_window),
@@ -16,17 +17,30 @@ void gt_gui_add_torrent(GtkButton *button, gpointer data) {
 			_("_Cancel"), GTK_RESPONSE_CANCEL,
 			_("_Open"), GTK_RESPONSE_ACCEPT,
 			NULL);
+
+	filter = gtk_file_filter_new();
+	gtk_file_filter_set_name(filter, "BitTorrent Seed File");
+	gtk_file_filter_add_mime_type(filter, "application/x-bittorrent");
+	gtk_file_filter_add_pattern(filter, "*.torrent");
+	gtk_file_chooser_set_filter(GTK_FILE_CHOOSER(chooser), filter);
+
+	gtk_file_chooser_set_select_multiple(GTK_FILE_CHOOSER(chooser), TRUE);
 	gint result = gtk_dialog_run(GTK_DIALOG(chooser));
 
 	// add a new torrent if successful
 	if (result == GTK_RESPONSE_ACCEPT) {
-		char *fname = gtk_file_chooser_get_filename(
+		GSList *fnames = gtk_file_chooser_get_filenames(
 				GTK_FILE_CHOOSER(chooser));
-		gt_torrent *gtp = gt_trnt_create(fname, NULL);
-		if (gtp != NULL)
-			gt_gui_add_torrent_item(GTK_LIST_BOX(mw_torrentlist),
-						gtp);
-		g_free(fname);
+		GSList *cur;
+		gt_torrent *gtp;
+		for (cur = fnames; cur != NULL; cur = cur->next) {
+			gtp = gt_trnt_create((char *)cur->data, NULL);
+			if (gtp != NULL)
+				gt_gui_add_torrent_item(
+					GTK_LIST_BOX(mw_torrentlist), gtp);
+			g_free(cur->data);
+		}
+		g_slist_free(fnames);
 	}
 
 	gtk_widget_destroy(chooser);

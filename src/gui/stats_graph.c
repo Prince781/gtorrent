@@ -36,7 +36,7 @@ gt_gui_stats_graph_draw(GtkWidget *canvas, cairo_t *cr, gpointer data) {
 	}
 
 	// draw chart
-	cairo_set_line_width(cr, 0.3);
+	cairo_set_line_width(cr, 1.3);
 	cairo_set_source_rgb(cr, 0.7, 0.1, 0.3);
 	largest = 0;
 	for (pb = p; ; p = p->next) {

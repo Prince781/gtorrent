@@ -10,6 +10,7 @@ Leftover Items
 - [X] enable session pause/play via headerbar button
 - [ ] add DBus notification / possible bell for finished torrents
 - [ ] enable running in the background (like Transmission)
+- [X] enable opening multiple torrents simultaneously through file dialog
 
 ##Core
 - [X] **wrapper** - asynchronous deletion of torrents after session close
