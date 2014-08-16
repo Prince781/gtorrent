@@ -19,4 +19,4 @@ Leftover Items
 
 ##Performance and Memory
 - [ ] squash all memory leak issues in Core and GLib-related functions
-- [ ] increase resize performance by moving all session updates to a single GDK idle thread
+- [X] increase resize performance by moving all session updates to a single GDK idle thread
