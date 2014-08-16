@@ -43,7 +43,8 @@ void		gt_trnt_geteta_fmt	(char *s, uint64_t sec);
 
 /* @gt_trnt_create(): create a simple gt_torrent from a file (possible magnet
  * link or local file) and a save path for the downloaded data. */
-gt_torrent	*gt_trnt_create		(const char *file, char *save_path);
+gt_torrent	*gt_trnt_create		(const char *file,
+					 const char *save_path);
 
 /* @gt_trnt_destroy(): delete a gt_torrent. Note that the next member is not
  * destroyed, and is only done so automatically if the torrent is on the list

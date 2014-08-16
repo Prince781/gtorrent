@@ -15,7 +15,7 @@ Leftover Items
 ##Core
 - [X] **wrapper** - asynchronous deletion of torrents after session close
 - [ ] **wrapper** - support session save / resume to file
-- [ ] **code** - change all `get` functions to take `const char *` rather than `char *`
+- [X] **code** - change all accessors to take `const char *`
 
 ##Performance and Memory
 - [ ] squash all memory leak issues in Core and GLib-related functions

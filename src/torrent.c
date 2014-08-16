@@ -120,7 +120,7 @@ void gt_trnt_geteta_fmt(char *s, uint64_t sec) {
 	sprintf(s, "%"PRIu64" sec", sec);
 }
 
-gt_torrent *gt_trnt_create(const char *file, char *save_path) {
+gt_torrent *gt_trnt_create(const char *file, const char *save_path) {
 	gt_torrent *gtp;
 	char savepath[1024];
 
