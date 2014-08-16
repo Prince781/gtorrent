@@ -167,7 +167,7 @@ void gt_gui_add_torrent_item(GtkListBox *listbox, gt_torrent *gtp) {
 	gtp->call = trnt_update;
 }
 
-gboolean gt_gui_trnt_post_statistics(gpointer listbox) {
+int gt_gui_trnt_post_statistics(void *listbox) {
 	extern GtkWidget *tstats_revealer;
 	extern GtkWidget *mwt_title;
 	extern GtkWidget *mwt_info[];

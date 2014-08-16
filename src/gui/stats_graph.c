@@ -84,7 +84,7 @@ gt_gui_stats_graph_draw(GtkWidget *canvas, cairo_t *cr, gpointer data) {
 	return FALSE;
 }
 
-gboolean gt_gui_stats_update(gpointer data) {
+int gt_gui_stats_update(void *data) {
 	if (data == NULL)
 		Console.error("%s: widget is null", "gt_gui_stats_update");
 	else

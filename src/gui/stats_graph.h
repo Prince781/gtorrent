@@ -8,6 +8,6 @@
 gboolean gt_gui_stats_graph_draw(GtkWidget *canvas, cairo_t *cr, gpointer);
 
 /* @gt_gui_stats_graph_update(): interval update function for session */
-gboolean gt_gui_stats_update(gpointer data);
+int gt_gui_stats_update(void *data);
 
 #endif

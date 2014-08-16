@@ -4,6 +4,7 @@
 #include "../gtorrent.h"
 #include "main_window.h"
 #include "stats.h"
+#include "event_handler.h"
 #include <gtk/gtk.h>
 #include <glib.h>
 #include <glib/gi18n.h>
@@ -56,10 +57,6 @@ static void session_start(GApplication *app, gpointer user_data) {
 		"/org/gt/gTorrent/gtorrentlogo.png", NULL)) == NULL)
 		Console.error("Could not find gtorrentlogo.png");
 
-	Console.debug("Initializing core...");
-	gt_core_session_start(GT_CORE_DEFAULT_PORTS());
-	gdk_threads_add_timeout(500, session_update, NULL);
-
 	g_action_map_add_action_entries(G_ACTION_MAP(app), app_action_entries,
 		-1, NULL);
 	app_menu = g_menu_new();
@@ -67,17 +64,25 @@ static void session_start(GApplication *app, gpointer user_data) {
 	g_menu_append(app_menu, "Quit", "app.quit");
 	gtk_application_set_app_menu(GTK_APPLICATION(app),
 		G_MENU_MODEL(app_menu));
+
+	// start gTorrent core
+	Console.debug("Initializing core...");
+	gt_core_session_start(GT_CORE_DEFAULT_PORTS());
+	gdk_threads_add_timeout(200, session_update, NULL);
 }
 
 // session_update: update gtorrent session
 static gboolean session_update(gpointer data) {
 	gt_core_session_update();
 	gt_gui_stat_update();
+	gt_gui_events_invoke();
 	return TRUE;	// TODO: detach if session is invalid
 }
+
 // session_stop: stop gtorrent session and end items
 static void session_stop(GApplication *app, gpointer user_data) {
 	Console.debug("gTorrent terminating...");
+	Console.debug("Unhooking %d events", gt_gui_events_destroy_all());
 	if (default_icon != NULL)
 		g_object_unref(default_icon);
 	if (default_logo != NULL)

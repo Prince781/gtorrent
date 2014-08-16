@@ -61,5 +61,6 @@ void gt_gui_add_magnet(GtkEntry *entry, gpointer data) {
 						gtp);
 	}
 
+	gtk_entry_set_text(entry, "");
 	gtk_widget_hide(popover);
 }

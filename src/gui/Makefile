@@ -6,7 +6,7 @@ LDLIBS		= `pkg-config --libs gtk+-3.0`
 OBJ		= gui.o
 OBJECTS		= main_window.o gtk_application_main.o torrent_add.o \
 torrent_item.o torrent_properties_window.o stats_graph.o stats.o \
-resources.o style.o
+event_handler.o resources.o style.o
 
 all: $(OBJ)
 
@@ -15,6 +15,9 @@ clean:
 
 $(OBJ): $(OBJECTS)
 	$(LD) -r *.o -o $(OBJ)
+
+event_handler.o: event_handler.c event_handler.h
+	$(CC) $(CFLAGS) $(LDFLAGS) -c event_handler.c $(LDLIBS)
 
 stats.o: stats.c stats.h
 	$(CC) $(CFLAGS) $(LDFLAGS) -c stats.c $(LDLIBS)

@@ -16,4 +16,4 @@ void gt_gui_add_torrent_item(GtkListBox *listbox, gt_torrent *gtp);
 
 /* @trnt_post_statistics(): show additional torrent statistics for the
  * selected torrent widget */
-gboolean gt_gui_trnt_post_statistics(gpointer);
+int gt_gui_trnt_post_statistics(void *);

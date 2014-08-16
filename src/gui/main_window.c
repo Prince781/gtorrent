@@ -6,6 +6,7 @@
 #include "main_window.h"
 #include "torrent_item.h"
 #include "stats_graph.h"
+#include "event_handler.h"
 
 const char mw_title[] = "gTorrent";
 GtkWidget *main_window;
@@ -23,7 +24,7 @@ static void tlist_update(GtkListBoxRow *, GtkListBoxRow *, gpointer);
 static void tlist_update_destroy(gpointer);
 
 // update main window elements according to session information
-static gboolean gt_gui_mwelems_update(gpointer);
+static int gt_gui_mwelems_update(void *);
 
 // toggle session paused state
 static void gt_gui_session_pause_toggle(GtkButton *, gpointer);
@@ -33,6 +34,8 @@ void gt_gui_activate(GApplication *app, gpointer user_data) {
 	GtkCssProvider *style;	// global css provider
 	GtkWidget *vbox;	// inside container after header bar
 
+	gui_event *trnt_update,
+		  *mwelems_update;
 	// widget init
 	main_window = gtk_application_window_new(GTK_APPLICATION(app));
 	mw_headerbar = gtk_header_bar_new();
@@ -64,10 +67,12 @@ void gt_gui_activate(GApplication *app, gpointer user_data) {
 	gtk_container_add(GTK_CONTAINER(main_window), vbox);
 
 	// set update for torrent statistics
-	gdk_threads_add_timeout(1000, gt_gui_trnt_post_statistics,
-		mw_torrentlist);
+	trnt_update = gt_gui_event_create(gt_gui_trnt_post_statistics,
+					    mw_torrentlist);
 	// set update for main window elements
-	gdk_threads_add_timeout(1000, gt_gui_mwelems_update, NULL);
+	mwelems_update = gt_gui_event_create(gt_gui_mwelems_update, NULL);
+	gt_gui_event_hook(trnt_update);
+	gt_gui_event_hook(mwelems_update);
 
 	gtk_widget_show_all(main_window);
 }
@@ -151,6 +156,8 @@ static void vbox_populate(GtkWidget *vb) {
 	};
 	GtkWidget *stats_divider;
 	GtkWidget *stats_canvas;
+
+	gui_event *stats_e;		// update statistics
 
 	// torrent list holder
 	trnt_list_holder = gtk_scrolled_window_new(NULL, NULL);
@@ -246,7 +253,9 @@ static void vbox_populate(GtkWidget *vb) {
 	stats_canvas = gtk_drawing_area_new();
 	g_signal_connect(stats_canvas, "draw",
 			 G_CALLBACK(gt_gui_stats_graph_draw), NULL);
-	gdk_threads_add_timeout(200, gt_gui_stats_update, stats_canvas); 
+	stats_e = gt_gui_event_create(gt_gui_stats_update, stats_canvas);
+	gt_gui_event_hook(stats_e);
+
 	gtk_box_pack_start(GTK_BOX(trnt_info), stats_canvas, TRUE, TRUE, 0);
 
 	// add widgets to vbox
@@ -287,7 +296,7 @@ static void tlist_update_destroy(gpointer data) {
 // update all important main window elements
 // note: this function should only be set after everything else has been 
 // initialized
-static gboolean gt_gui_mwelems_update(gpointer data) {
+static int gt_gui_mwelems_update(void *data) {
 	session *ses;
 	GtkWidget *image;
 
