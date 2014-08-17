@@ -5,6 +5,7 @@
 #include "main_window.h"
 #include "stats.h"
 #include "event_handler.h"
+#include "systray.h"
 #include <gtk/gtk.h>
 #include <glib.h>
 #include <glib/gi18n.h>

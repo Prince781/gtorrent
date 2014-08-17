@@ -7,6 +7,7 @@
 #include "torrent_item.h"
 #include "stats_graph.h"
 #include "event_handler.h"
+#include "systray.h"
 
 const char mw_title[] = "gTorrent";
 GtkWidget *main_window;
@@ -75,6 +76,11 @@ void gt_gui_activate(GApplication *app, gpointer user_data) {
 	gt_gui_event_hook(mwelems_update);
 
 	gtk_widget_show_all(main_window);
+
+	// initialize status icon
+	if (!gt_gui_systray_init(
+		gtk_window_get_screen(GTK_WINDOW(main_window))))
+		Console.error("Could not initialize status icon.");
 }
 
 // populate headerbar and initialize
