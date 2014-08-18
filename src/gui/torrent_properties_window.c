@@ -157,7 +157,7 @@ void gt_gui_show_torrent_properties(gt_torrent *gtp) {
 	gtk_box_pack_start(GTK_BOX(peer_option[1]), superseeding_label,
 			   TRUE, TRUE, 0);
 	superseeding_switch = gtk_switch_new();
-	gtk_switch_set_state(GTK_SWITCH(superseeding_switch),
+	gtk_switch_set_active(GTK_SWITCH(superseeding_switch),
 			     super_seeding);
 	gtk_widget_set_halign(superseeding_switch, GTK_ALIGN_END);
 	gtk_box_pack_end(GTK_BOX(peer_option[1]), superseeding_switch,
@@ -181,7 +181,7 @@ void gt_gui_show_torrent_properties(gt_torrent *gtp) {
 			GTK_TOGGLE_BUTTON(limit_maxpeers_chkbox)) ?
 			(int) gtk_spin_button_get_value(
 				GTK_SPIN_BUTTON(limit_maxpeers_spin)) : -1;
-		super_seeding = gtk_switch_get_state(
+		super_seeding = gtk_switch_get_active(
 				GTK_SWITCH(superseeding_switch));
 		lt_trnt_handle_set_download_limit(gtp->th, download_limit);
 		lt_trnt_handle_set_upload_limit(gtp->th, upload_limit);
