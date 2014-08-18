@@ -5,9 +5,7 @@
 static gui_event base = { NULL, NULL };		// start of gui event list
 
 gui_event *gt_gui_event_create(int (*func)(void *), void *data) {
-	gui_event *e;
-
-	e = (gui_event *) malloc(sizeof(gui_event));
+	gui_event *e = malloc(sizeof(gui_event));
 
 	e->data = data;
 	e->func = func;

@@ -124,7 +124,7 @@ gt_torrent *gt_trnt_create(const char *file, const char *save_path) {
 	gt_torrent *gtp;
 	char savepath[1024];
 
-	if ((gtp = (gt_torrent *)malloc(sizeof(gt_torrent))) == NULL)
+	if ((gtp = malloc(sizeof(gt_torrent))) == NULL)
 		return NULL;
 	gtp->tp = NULL;
 	gtp->ti = NULL;
