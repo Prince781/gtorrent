@@ -171,7 +171,7 @@ int gt_gui_trnt_post_statistics(void *listbox) {
 	extern GtkWidget *tstats_revealer;
 	extern GtkWidget *mwt_title;
 	extern GtkWidget *mwt_info[];
-	GtkListBox *selected;
+	GtkListBoxRow *selected;
 	gt_torrent *gtp;
 	torrent_status *status;
 	static char buf[1024];
