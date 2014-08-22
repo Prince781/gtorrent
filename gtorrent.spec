@@ -9,8 +9,8 @@ Source0:        ftp://ftp.prince781.net/linux/%{name}/%{name}-%{version}.tar.gz
 
 #BuildRequires:  libtorrent-rasterbar
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root
-BuildRequires:  gtk3 libnotify
-Requires:       libtorrent-rasterbar, gtk3, libnotify
+BuildRequires:  rb_libtorrent gtk3 libnotify
+Requires:       rb_libtorrent, gtk3, libnotify
 
 %description
 gTorrent is a torrent client and frontend to libtorrent for GNOME, written in
