@@ -1,16 +1,17 @@
 # Makefile for gTorrent
 SRC	= src
-PRGRM	= /usr/bin/gTorrent
+DESTDIR = /usr/bin
 
 all:
 	$(MAKE) -C $(SRC)
 
 install:
-	cp gTorrent $(PRGRM)
-	chmod a+x $(PRGRM)
+	mkdir -p $(DESTDIR)
+	cp gTorrent $(DESTDIR)/gTorrent
+	chmod a+x $(DESTDIR)
 
 uninstall:
-	$(RM) $(PRGRM)
+	$(RM) $(DESTDIR)/gTorrent
 
 clean:
 	$(MAKE) clean -C $(SRC)
