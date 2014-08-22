@@ -47,7 +47,7 @@ void gt_gui_add_torrent_item(GtkListBox *listbox, gt_torrent *gtp) {
 	GtkWidget *trnt_eta;		// eg. "1 min, 24 sec" label
 
 	GtkWidget *trnt_progress;	// progress bar
-	
+
 	GtkWidget *options_button;	// torrent options
 	GtkWidget *options_icon;
 
@@ -83,13 +83,13 @@ void gt_gui_add_torrent_item(GtkListBox *listbox, gt_torrent *gtp) {
 	center_box = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
 	gtk_widget_set_size_request(center_box, 400, -1);
 	gtk_box_pack_start(GTK_BOX(box), center_box, TRUE, TRUE, 0);
-	
+
 	// center box: torrent name
 	trnt_name = gtk_label_new( lt_trnt_params_get_name(gtp->tp) );
 	gtk_label_set_ellipsize(GTK_LABEL(trnt_name), PANGO_ELLIPSIZE_MIDDLE);
 	gtk_widget_set_halign(trnt_name, GTK_ALIGN_START);
 	gtk_box_pack_start(GTK_BOX(center_box), trnt_name, TRUE, TRUE, 0);
-	
+
 	// center box: torrent status (box)
 	trnt_status = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
 	gtk_box_pack_start(GTK_BOX(center_box), trnt_status, TRUE, TRUE, 0);
@@ -172,23 +172,22 @@ int gt_gui_trnt_post_statistics(void *listbox) {
 	extern GtkWidget *tstats_revealer;
 	extern GtkWidget *mwt_title;
 	extern GtkWidget *mwt_info[];
-	GList *selected;
+	GtkListBoxRow *selected;
 	gt_torrent *gtp;
 	torrent_status *status;
 	static char buf[1024];
 	int b = 1024;
 	uint64_t age;
 
-	selected = gtk_list_box_get_selected_rows(GTK_LIST_BOX(listbox));
+	selected = gtk_list_box_get_selected_row(GTK_LIST_BOX(listbox)); 
 
 	// we are only concerned with first element of linked list
 	if (selected != NULL) {
 		gtp = (gt_torrent *) g_object_get_data(
-				G_OBJECT(selected->data), "torrent");
+				G_OBJECT(selected), "torrent");
 		if (gtp == NULL) {
 			Console.error("%s: could not get torrent stats",
 				      "gt_gui_trnt_post_statistics");
-			g_list_free(selected);
 			return TRUE;
 		}
 		// reveal if hidden
@@ -222,12 +221,11 @@ int gt_gui_trnt_post_statistics(void *listbox) {
 		gtk_label_set_label(GTK_LABEL(mwt_info[5]), buf);
 		snprintf(buf, b, "%d", status->priority);
 		gtk_label_set_label(GTK_LABEL(mwt_info[6]), buf);
-		g_list_free(selected);
 	} else if (gtk_revealer_get_child_revealed(
 			GTK_REVEALER(tstats_revealer)))
 		gtk_revealer_set_reveal_child(GTK_REVEALER(tstats_revealer),
 				FALSE);
-	
+
 	return TRUE;
 }
 
@@ -261,7 +259,7 @@ static void trnt_show_properties(GSimpleAction *action, GVariant *param,
 			      " torrent", "trnt_show_properties");
 		return;
 	}
-	gt_gui_show_torrent_properties(gtp);	
+	gt_gui_show_torrent_properties(gtp);
 }
 
 static void trnt_open_folder(GSimpleAction *action, GVariant *param,
