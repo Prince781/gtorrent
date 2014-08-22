@@ -5,6 +5,7 @@
 #include "torrent_item.h"
 #include "torrent_properties_window.h"
 #include "../console.h"
+#include "systray.h"
 #include <string.h>
 
 /* @trnt_pause_toggle(): toggle paused state of torrent */
@@ -204,7 +205,7 @@ int gt_gui_trnt_post_statistics(void *listbox) {
 		snprintf(buf, b, "%d out of %d", status->num_peers,
 						   status->num_connections);
 		gtk_label_set_label(GTK_LABEL(mwt_info[0]), buf);
-		gt_trnt_getrate(status->upload_payload_rate, buf);
+		gt_trnt_getrate(status->upload_rate, buf);
 		gtk_label_set_label(GTK_LABEL(mwt_info[1]), buf);
 		gt_trnt_getrate(status->download_payload_rate, buf);
 		gtk_label_set_label(GTK_LABEL(mwt_info[2]), buf);
@@ -332,6 +333,12 @@ static int trnt_update(gt_alert *ga) {
 			(double) status->total_done / status->total_wanted);
 	else
 		gtk_progress_bar_pulse(widgets->progress);
+	
+	if (ga->type == torrent_finished_alert) {
+		snprintf(buf, 100, "%s has finished downloading.",
+			 status->name);
+		gt_gui_systray_notify(buf, "Download Finished");
+	}
 	return 1;
 }
 

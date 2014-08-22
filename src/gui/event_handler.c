@@ -40,7 +40,7 @@ gui_event *gt_gui_event_unhook(gui_event *e) {
 
 int gt_gui_events_invoke(void) {
 	gui_event *ep;
-	int total;
+	int total = 0;
 
 	for (ep = &base; ep != NULL; ep = ep->next)
 		if (ep->func != NULL)

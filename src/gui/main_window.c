@@ -77,10 +77,29 @@ void gt_gui_activate(GApplication *app, gpointer user_data) {
 
 	gtk_widget_show_all(main_window);
 
-	// initialize status icon
-	if (!gt_gui_systray_init(
-		gtk_window_get_screen(GTK_WINDOW(main_window))))
-		Console.error("Could not initialize status icon.");
+	// initialize systray
+	if (!gt_gui_systray_start())
+		Console.error("Could not initialize systray.");
+}
+
+void gt_gui_open(GApplication *app, gpointer fs, int n, char *hint,
+			 gpointer data) {
+	extern GtkWidget *mw_torrentlist;
+	char *fname;
+	int i;
+	gt_torrent *gtp;
+	GFile **files = (GFile **) fs;
+
+
+	for (i=0; i<n; ++i) {
+		fname = g_file_get_path(files[i]);
+		gtp = gt_trnt_create(fname, NULL);
+		if (gtp != NULL)
+			gt_gui_trnt_add_to_queue(gtp);
+	}
+
+	gt_gui_activate(app, data);
+	gt_gui_trnt_add_all();
 }
 
 // populate headerbar and initialize

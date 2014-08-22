@@ -3,12 +3,13 @@ Leftover Items
 
 ##User Interface
 - [X] draw labels into `cairo_t` object for statistics graph
+- [ ] refine/rewrite statistics graph
 - [X] enable delete button
 - [X] enable magnet link button
 - [ ] write UI for managing system-wide settings
 - [X] add "about" dialog and GtkApplication menu
 - [X] enable session pause/play via headerbar button
-- [ ] add DBus notification / possible bell for finished torrents
+- [X] add DBus notification / possible bell for finished torrents
 - [ ] enable running in the background (like Transmission)
 - [X] enable opening multiple torrents simultaneously through file dialog
 

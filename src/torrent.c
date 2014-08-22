@@ -36,13 +36,13 @@ void gt_trnt_getfsize(uint64_t fsize, char *s) {
 
 void gt_trnt_getfsizep(uint64_t fsize, int p, char *s) {
 	if (fsize / TERABYTE)
-		sprintf(s, "%.*g TB", p, fsize / (double)TERABYTE);
+		sprintf(s, "%.*f TB", p, fsize / (double)TERABYTE);
 	else if (fsize / GIGABYTE)
-		sprintf(s, "%.*g GB", p, fsize / (double)GIGABYTE);
+		sprintf(s, "%.*f GB", p, fsize / (double)GIGABYTE);
 	else if (fsize / MEGABYTE)
-		sprintf(s, "%.*g MB", p, fsize / (double)MEGABYTE);
+		sprintf(s, "%.*f MB", p, fsize / (double)MEGABYTE);
 	else if (fsize / KILOBYTE)
-		sprintf(s, "%.*g kB", p, fsize / (double)KILOBYTE);
+		sprintf(s, "%.*f kB", p, fsize / (double)KILOBYTE);
 	else
 		sprintf(s, "%u B", (unsigned) fsize);
 }

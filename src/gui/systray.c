@@ -1,23 +1,25 @@
 #include "systray.h"
-#include "main_window.h"
-#include <stdlib.h>
+#include <libnotify/notify.h>
 
-const char stat_icon_name[] = "gtorrent";
-GtkStatusIcon *status_icon;
+const char stat_app_name[] = "gTorrent";
 
-int gt_gui_systray_init(GdkScreen *screen) {
-	if (status_icon != NULL)
-		return 0;
-
-	extern GdkPixbuf *default_icon;		// window icon for gTorrent
-	status_icon = gtk_status_icon_new_from_pixbuf(default_icon);
-
-	if (status_icon == NULL)
-		return 0;
-
-	gtk_status_icon_set_screen(status_icon, screen);
-	gtk_status_icon_set_title(status_icon, mw_title);
-	gtk_status_icon_set_name(status_icon, stat_icon_name);
-	gtk_status_icon_set_tooltip_text(status_icon, mw_title);
-	return 1;
+int gt_gui_systray_start(void) {
+	return notify_init(stat_app_name);
 }
+
+int gt_gui_systray_notify(const char *summary, const char *body) {
+	NotifyNotification *notif;
+	extern GdkPixbuf *default_icon;
+
+	notif = notify_notification_new(summary, body, NULL);
+	notify_notification_set_app_name(notif, stat_app_name);
+	notify_notification_set_icon_from_pixbuf(notif, default_icon);
+	
+	return notify_notification_show(notif, NULL);
+}
+
+void gt_gui_systray_stop(void) {
+	notify_uninit();
+}
+
+

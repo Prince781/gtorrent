@@ -1,8 +1,8 @@
 LD		= ld
 CC		= gcc
 CFLAGS		= -g -Wall -O0
-LDFLAGS		= `pkg-config --cflags gtk+-3.0`
-LDLIBS		= `pkg-config --libs gtk+-3.0`
+LDFLAGS		= `pkg-config --cflags gtk+-3.0 libnotify`
+LDLIBS		= `pkg-config --libs gtk+-3.0 libnotify`
 OBJ		= gui.o
 OBJECTS		= main_window.o gtk_application_main.o torrent_add.o \
 torrent_item.o torrent_properties_window.o stats_graph.o stats.o \

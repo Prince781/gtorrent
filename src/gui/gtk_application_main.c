@@ -6,6 +6,7 @@
 #include "stats.h"
 #include "event_handler.h"
 #include "systray.h"
+#include "torrent_add.h"
 #include <gtk/gtk.h>
 #include <glib.h>
 #include <glib/gi18n.h>
@@ -27,11 +28,14 @@ int main(int argc, char *argv[]) {
 	int status;
 	
 
-	app = gtk_application_new("org.gt.gTorrent", G_APPLICATION_FLAGS_NONE);
+	app = gtk_application_new("org.gt.gTorrent",
+			G_APPLICATION_FLAGS_NONE | G_APPLICATION_HANDLES_OPEN);
 
 	g_signal_connect(app, "startup", G_CALLBACK(session_start), NULL);
 	g_signal_connect(app, "activate", G_CALLBACK(gt_gui_activate), NULL);
+	g_signal_connect(app, "open", G_CALLBACK(gt_gui_open), NULL);
 	g_signal_connect(app, "shutdown", G_CALLBACK(session_stop), NULL);
+
 
 	status = g_application_run(G_APPLICATION(app), argc, argv);
 	g_object_unref(app);
@@ -89,7 +93,8 @@ static void session_stop(GApplication *app, gpointer user_data) {
 	if (default_logo != NULL)
 		g_object_unref(default_logo);
 	gt_gui_stat_destroy();
-	gt_core_session_end();
+	gt_gui_trnt_destroy_all();	// destroy all queued torrents
+	gt_core_session_end();		// destroy all added torrents, session
 }
 
 static void app_show_about(GSimpleAction *action, GVariant *p, gpointer data) {

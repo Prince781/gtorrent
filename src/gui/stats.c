@@ -23,7 +23,8 @@ void gt_gui_stat_update(void) {
 }
 
 void gt_gui_stat_destroy(void) {
-	free_base(&base);
+	if (base != NULL)
+		free_base(&base);
 }
 
 static void init_base(void) {

@@ -1,10 +1,9 @@
 # Makefile for gTorrent
-# note: GUI is disabled at the moment. edit this makefile to enable it
 LD          = ld
 CC          = gcc
 CXX         = g++
 CFLAGS      = -ggdb -Wall -O0
-LDFLAGS     = `pkg-config --libs libtorrent-rasterbar gtk+-3.0`
+LDFLAGS     = `pkg-config --libs libtorrent-rasterbar gtk+-3.0 libnotify`
 BIN         = ../gTorrent
 LIBTORRENT  = wrappers/libtorrent.o
 GUI         = gui/gui.o
