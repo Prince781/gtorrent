@@ -2,6 +2,7 @@ Leftover Items
 ==============
 
 ##User Interface
+- [ ] use GtkBuilder for interface
 - [X] draw labels into `cairo_t` object for statistics graph
 - [ ] refine/rewrite statistics graph
 - [X] enable delete button
@@ -14,6 +15,7 @@ Leftover Items
 - [X] enable opening multiple torrents simultaneously through file dialog
 
 ##Core
+- [ ] use [an actual C library](https://github.com/willemt/yabtorrent)
 - [X] **wrapper** - asynchronous deletion of torrents after session close
 - [ ] **wrapper** - support session save / resume to file
 - [X] **code** - change all accessors to take `const char *`
